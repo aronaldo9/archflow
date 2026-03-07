@@ -1,13 +1,32 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { getProjectById } from "@/lib/data";
+import {
+  getProjectById,
+  getDocumentsByProject,
+  getExpensesByProject,
+  getActivityByProject,
+  getTeamByProject,
+} from "@/lib/data";
 import { formatCurrency, formatDate, getPhaseLabel } from "@/lib/utils";
 import StatusBadge from "@/components/StatusBadge";
 import ProgressBar from "@/components/ProgressBar";
 import ProjectTimeline from "@/components/ProjectTimeline";
+import EditProjectModal from "@/components/EditProjectModal";
+import MilestoneManager from "@/components/MilestoneManager";
+import DocumentsSection from "@/components/DocumentsSection";
+import ProjectGallery from "@/components/ProjectGallery";
+import ExpenseManager from "@/components/ExpenseManager";
+import ActivityFeed from "@/components/ActivityFeed";
+import TeamSection from "@/components/TeamSection";
 
 export default async function ProjectDetailPage({ params }: { params: { id: string } }) {
-  const project = await getProjectById(params.id);
+  const [project, rawDocuments, expenses, activity, team] = await Promise.all([
+    getProjectById(params.id),
+    getDocumentsByProject(params.id),
+    getExpensesByProject(params.id),
+    getActivityByProject(params.id, 20),
+    getTeamByProject(params.id),
+  ]);
   if (!project) notFound();
 
   const budgetPct = project.budget > 0 ? (project.spent / project.budget) * 100 : 0;
@@ -16,6 +35,49 @@ export default async function ProjectDetailPage({ params }: { params: { id: stri
   const tags = project.tags
     ? project.tags.split(",").map((t) => t.trim()).filter(Boolean)
     : [];
+
+  // Serialize dates so they can be passed to Client Components
+  const editData = {
+    id: project.id,
+    name: project.name,
+    description: project.description,
+    location: project.location,
+    budget: project.budget,
+    startDate: new Date(project.startDate).toISOString(),
+    endDate: new Date(project.endDate).toISOString(),
+    clientName: project.clientName,
+    status: project.status,
+    phase: project.phase,
+  };
+
+  const serializedMilestones = milestones.map((m) => ({
+    ...m,
+    dueDate: new Date(m.dueDate).toISOString(),
+  }));
+
+  const IMAGE_EXT = /\.(svg|jpg|jpeg|png|gif|webp)$/i;
+  const serializedDocuments = rawDocuments
+    .filter((d) => !IMAGE_EXT.test(d.name))
+    .map((d) => ({ ...d, uploadedAt: new Date(d.uploadedAt).toISOString() }));
+  const serializedImages = rawDocuments
+    .filter((d) => IMAGE_EXT.test(d.name))
+    .map((d) => ({ ...d, uploadedAt: new Date(d.uploadedAt).toISOString() }));
+
+  const serializedExpenses = expenses.map((e) => ({
+    ...e,
+    date: new Date(e.date).toISOString(),
+    createdAt: new Date(e.createdAt).toISOString(),
+  }));
+
+  const serializedActivity = activity.map((a) => ({
+    ...a,
+    createdAt: new Date(a.createdAt).toISOString(),
+  }));
+
+  const serializedTeam = team.map((m) => ({
+    ...m,
+    createdAt: new Date(m.createdAt).toISOString(),
+  }));
 
   return (
     <div className="max-w-6xl space-y-6">
@@ -34,14 +96,29 @@ export default async function ProjectDetailPage({ params }: { params: { id: stri
       <div className="bg-zinc-800/50 border border-zinc-700/50 rounded-xl p-6">
         <div className="flex flex-col lg:flex-row lg:items-start gap-4">
           <div className="flex-1">
-            <div className="flex flex-wrap items-center gap-2 mb-2">
-              <span className="text-xs font-mono text-zinc-500 bg-zinc-800 px-2 py-0.5 rounded">
-                {project.code}
-              </span>
-              <StatusBadge status={project.status} />
-              <span className="text-xs text-zinc-500 bg-zinc-800 px-2 py-0.5 rounded">
-                {getPhaseLabel(project.phase)}
-              </span>
+            <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-xs font-mono text-zinc-500 bg-zinc-800 px-2 py-0.5 rounded">
+                  {project.code}
+                </span>
+                <StatusBadge status={project.status} />
+                <span className="text-xs text-zinc-500 bg-zinc-800 px-2 py-0.5 rounded">
+                  {getPhaseLabel(project.phase)}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Link
+                  href={`/report/${project.id}`}
+                  target="_blank"
+                  className="flex items-center gap-2 text-zinc-400 hover:text-white border border-zinc-700 hover:border-zinc-500 text-sm font-medium px-3 py-1.5 rounded-lg transition-colors"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                  </svg>
+                  Exportar Informe
+                </Link>
+                <EditProjectModal project={editData} />
+              </div>
             </div>
             <h2 className="text-2xl font-semibold text-white mb-2">{project.name}</h2>
             {project.description && (
@@ -110,6 +187,9 @@ export default async function ProjectDetailPage({ params }: { params: { id: stri
         </div>
       )}
 
+      {/* Galería de imágenes */}
+      <ProjectGallery projectId={project.id} images={serializedImages} />
+
       {/* Cuadrícula principal */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Columna izquierda */}
@@ -131,46 +211,16 @@ export default async function ProjectDetailPage({ params }: { params: { id: stri
             </p>
           </Card>
 
-          {/* Hitos */}
-          {milestones.length > 0 && (
-            <Card title="Hitos">
-              <ul className="space-y-3">
-                {milestones.map((m) => (
-                  <li key={m.id} className="flex items-center gap-3">
-                    <div
-                      className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 border-2 ${
-                        m.completed
-                          ? "bg-emerald-500/20 border-emerald-500"
-                          : "border-zinc-600 bg-transparent"
-                      }`}
-                    >
-                      {m.completed && (
-                        <svg className="w-3 h-3 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                        </svg>
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p
-                        className={`text-sm font-medium ${
-                          m.completed ? "text-zinc-400 line-through" : "text-white"
-                        }`}
-                      >
-                        {m.title}
-                      </p>
-                    </div>
-                    <span
-                      className={`text-xs flex-shrink-0 ${
-                        m.completed ? "text-zinc-600" : "text-zinc-400"
-                      }`}
-                    >
-                      {formatDate(m.dueDate)}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </Card>
-          )}
+          {/* Gastos */}
+          <ExpenseManager projectId={project.id} expenses={serializedExpenses} />
+
+          {/* Hitos — interactive */}
+          <Card title="">
+            <MilestoneManager projectId={project.id} milestones={serializedMilestones} />
+          </Card>
+
+          {/* Documentos */}
+          <DocumentsSection projectId={project.id} documents={serializedDocuments} />
         </div>
 
         {/* Columna derecha */}
@@ -212,6 +262,12 @@ export default async function ProjectDetailPage({ params }: { params: { id: stri
               <Row label="ID del Proyecto" value={<span className="font-mono text-xs">{project.id}</span>} />
             </dl>
           </Card>
+
+          {/* Equipo */}
+          <TeamSection projectId={project.id} members={serializedTeam} />
+
+          {/* Actividad */}
+          <ActivityFeed activities={serializedActivity} />
         </div>
       </div>
     </div>
@@ -221,7 +277,9 @@ export default async function ProjectDetailPage({ params }: { params: { id: stri
 function Card({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="bg-zinc-800/50 border border-zinc-700/50 rounded-xl p-5">
-      <h3 className="text-white font-medium mb-4 text-sm uppercase tracking-wider text-zinc-400">{title}</h3>
+      {title && (
+        <h3 className="text-white font-medium mb-4 text-sm uppercase tracking-wider text-zinc-400">{title}</h3>
+      )}
       {children}
     </div>
   );

@@ -16,6 +16,14 @@ export interface Milestone {
   projectId: string;
 }
 
+export interface Document {
+  id: string;
+  name: string;
+  fileUrl: string;
+  uploadedAt: Date | string;
+  projectId: string;
+}
+
 export interface Project {
   id: string;
   name: string;
@@ -36,6 +44,7 @@ export interface Project {
   createdAt: Date | string;
   updatedAt: Date | string;
   milestones?: Milestone[];
+  documents?: Document[];
 }
 
 export interface ProjectStats {
