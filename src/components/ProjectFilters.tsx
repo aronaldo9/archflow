@@ -5,6 +5,7 @@ import { useCallback, useTransition } from "react";
 
 interface Props {
   counts: Record<string, number>;
+  typeCounts: Record<string, number>;
 }
 
 const FILTERS = [
@@ -16,12 +17,19 @@ const FILTERS = [
   { key: "on_hold",     label: "En Pausa" },
 ];
 
-export default function ProjectFilters({ counts }: Props) {
+const TYPE_FILTERS = [
+  { key: "all",            label: "Todos los tipos" },
+  { key: "administrative", label: "Administrativo" },
+  { key: "personal",       label: "Personal" },
+];
+
+export default function ProjectFilters({ counts, typeCounts }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [, startTransition] = useTransition();
 
   const status = searchParams.get("status") ?? "all";
+  const type   = searchParams.get("type")   ?? "all";
   const q = searchParams.get("q") ?? "";
 
   const update = useCallback(
@@ -60,7 +68,7 @@ export default function ProjectFilters({ counts }: Props) {
         />
       </div>
 
-      {/* Pills */}
+      {/* Status pills */}
       <div className="flex flex-wrap gap-2">
         {FILTERS.map((f) => (
           <button
@@ -74,6 +82,24 @@ export default function ProjectFilters({ counts }: Props) {
           >
             {f.label}
             <span className="ml-1.5 text-xs opacity-60">{counts[f.key] ?? 0}</span>
+          </button>
+        ))}
+      </div>
+
+      {/* Type pills */}
+      <div className="flex flex-wrap gap-2">
+        {TYPE_FILTERS.map((f) => (
+          <button
+            key={f.key}
+            onClick={() => update("type", f.key)}
+            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+              type === f.key
+                ? "bg-zinc-700 text-white"
+                : "text-zinc-400 hover:text-white hover:bg-zinc-800"
+            }`}
+          >
+            {f.label}
+            <span className="ml-1.5 text-xs opacity-60">{typeCounts[f.key] ?? 0}</span>
           </button>
         ))}
       </div>

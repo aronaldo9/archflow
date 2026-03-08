@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -48,38 +49,8 @@ export default function Sidebar() {
   return (
     <aside className="fixed inset-y-0 left-0 w-64 bg-zinc-950 border-r border-zinc-800 flex flex-col z-30">
       {/* Logo */}
-      <div className="h-16 flex items-center px-5 border-b border-zinc-800">
-        <svg viewBox="0 0 192 48" width="192" height="48" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <linearGradient id="sb-gold" x1="24" y1="38" x2="24" y2="4" gradientUnits="userSpaceOnUse">
-              <stop offset="0%"   stopColor="#78350f" />
-              <stop offset="40%" stopColor="#d97706" />
-              <stop offset="100%" stopColor="#fde68a" />
-            </linearGradient>
-            <linearGradient id="sb-blue" x1="0" y1="0" x2="48" y2="0" gradientUnits="userSpaceOnUse">
-              <stop offset="0%"   stopColor="#1e3a8a" />
-              <stop offset="55%" stopColor="#2563eb" />
-              <stop offset="100%" stopColor="#7dd3fc" />
-            </linearGradient>
-          </defs>
-
-          {/* Outer arch */}
-          <path d="M2 38 C2 8 46 8 46 38" stroke="url(#sb-gold)" strokeWidth="4.5" strokeLinecap="round"/>
-          {/* Inner arch */}
-          <path d="M8 38 C8 17 40 17 40 38" stroke="url(#sb-gold)" strokeWidth="2.5" strokeLinecap="round" opacity="0.72"/>
-
-          {/* Wave 1 */}
-          <path d="M0 40 C7 37 13 43.5 24 40 C35 36.5 41 43 48 40" stroke="url(#sb-blue)" strokeWidth="2" strokeLinecap="round"/>
-          {/* Wave 2 */}
-          <path d="M1 44.5 C8 42 14 47 24 44.5 C34 42 40 46.5 47 44.5" stroke="url(#sb-blue)" strokeWidth="1.3" strokeLinecap="round" opacity="0.5"/>
-
-          {/* Wordmark */}
-          <text x="58" y="26" fontFamily="system-ui,-apple-system,sans-serif" fontSize="21" fontWeight="700" letterSpacing="-0.4" fill="white">Arch</text>
-          <text x="101" y="26" fontFamily="system-ui,-apple-system,sans-serif" fontSize="21" fontWeight="700" letterSpacing="-0.4" fill="#60a5fa">Flow</text>
-
-          {/* Subtitle */}
-          <text x="59" y="40" fontFamily="system-ui,-apple-system,sans-serif" fontSize="7.5" fontWeight="400" fill="#71717a" letterSpacing="1.8">ARQUITECTURA</text>
-        </svg>
+      <div className="h-16 flex items-center justify-center border-b border-zinc-800" style={{ padding: "2px" }}>
+        <Image src="/logo.png" alt="ArchFlow" width={240} height={60} className="h-full w-auto object-contain" priority />
       </div>
 
       {/* Nav */}

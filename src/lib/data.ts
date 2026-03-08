@@ -1,17 +1,33 @@
 import { prisma } from "./prisma";
 
 export async function getAllProjects() {
-  return prisma.project.findMany({
-    include: { milestones: { orderBy: { dueDate: "asc" } } },
-    orderBy: { updatedAt: "desc" },
-  });
+  const [projects, typeRows] = await Promise.all([
+    prisma.project.findMany({
+      include: { milestones: { orderBy: { dueDate: "asc" } } },
+      orderBy: { updatedAt: "desc" },
+    }),
+    prisma.$queryRaw<{ id: string; type: string }[]>`SELECT id, type FROM "Project"`,
+  ]);
+  const typeMap = Object.fromEntries(typeRows.map((r) => [r.id, r.type]));
+  return projects.map((p) => ({
+    ...p,
+    type: (typeMap[p.id] ?? "administrative") as "administrative" | "personal",
+  }));
 }
 
 export async function getProjectById(id: string) {
-  return prisma.project.findUnique({
-    where: { id },
-    include: { milestones: { orderBy: { dueDate: "asc" } } },
-  });
+  const [project, typeRows] = await Promise.all([
+    prisma.project.findUnique({
+      where: { id },
+      include: { milestones: { orderBy: { dueDate: "asc" } } },
+    }),
+    prisma.$queryRaw<{ id: string; type: string }[]>`SELECT id, type FROM "Project" WHERE id = ${id}`,
+  ]);
+  if (!project) return null;
+  return {
+    ...project,
+    type: (typeRows[0]?.type ?? "administrative") as "administrative" | "personal",
+  };
 }
 
 export async function getDocumentsByProject(projectId: string) {
@@ -115,16 +131,22 @@ export async function updateProject(
     clientName?: string;
     status?: string;
     phase?: string;
+    type?: string;
   }
 ) {
-  return prisma.project.update({
+  const { type, ...rest } = data;
+  const project = await prisma.project.update({
     where: { id },
     data: {
-      ...data,
-      ...(data.startDate && { startDate: new Date(data.startDate) }),
-      ...(data.endDate && { endDate: new Date(data.endDate) }),
+      ...rest,
+      ...(rest.startDate && { startDate: new Date(rest.startDate) }),
+      ...(rest.endDate && { endDate: new Date(rest.endDate) }),
     },
   });
+  if (type) {
+    await prisma.$executeRaw`UPDATE "Project" SET "type" = ${type} WHERE "id" = ${id}`;
+  }
+  return project;
 }
 
 export async function calculateProjectProgress(projectId: string): Promise<number> {
@@ -304,6 +326,7 @@ export async function createProject(data: {
   description?: string;
   status: string;
   phase: string;
+  type?: string;
   location?: string;
   budget: number;
   startDate: string;
@@ -313,11 +336,16 @@ export async function createProject(data: {
   clientPhone?: string;
   tags?: string;
 }) {
-  return prisma.project.create({
+  const { type, ...rest } = data;
+  const project = await prisma.project.create({
     data: {
-      ...data,
-      startDate: new Date(data.startDate),
-      endDate: new Date(data.endDate),
+      ...rest,
+      startDate: new Date(rest.startDate),
+      endDate: new Date(rest.endDate),
     },
   });
+  if (type) {
+    await prisma.$executeRaw`UPDATE "Project" SET "type" = ${type} WHERE "id" = ${project.id}`;
+  }
+  return project;
 }

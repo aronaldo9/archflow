@@ -23,6 +23,7 @@ model Project {
   clientName  String
   clientEmail String?
   clientPhone String?
+  type        String      @default("administrative")
   tags        String?
   latitude    Float?
   longitude   Float?

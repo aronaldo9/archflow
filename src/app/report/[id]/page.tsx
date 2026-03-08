@@ -42,27 +42,8 @@ export default async function ReportPage({ params }: { params: { id: string } })
           {/* Cover */}
           <div className="flex items-start justify-between mb-10 pb-8 border-b-2 border-zinc-900">
             <div>
-              <svg viewBox="0 0 260 68" width="260" height="68" fill="none" xmlns="http://www.w3.org/2000/svg" className="mb-4">
-                <defs>
-                  <linearGradient id="rpt-gold" x1="34" y1="52" x2="34" y2="4" gradientUnits="userSpaceOnUse">
-                    <stop offset="0%"   stopColor="#78350f" />
-                    <stop offset="40%" stopColor="#d97706" />
-                    <stop offset="100%" stopColor="#fde68a" />
-                  </linearGradient>
-                  <linearGradient id="rpt-blue" x1="0" y1="0" x2="68" y2="0" gradientUnits="userSpaceOnUse">
-                    <stop offset="0%"   stopColor="#1e3a8a" />
-                    <stop offset="55%" stopColor="#2563eb" />
-                    <stop offset="100%" stopColor="#7dd3fc" />
-                  </linearGradient>
-                </defs>
-                <path d="M3 52 C3 10 65 10 65 52" stroke="url(#rpt-gold)" strokeWidth="6" strokeLinecap="round"/>
-                <path d="M11 52 C11 22 57 22 57 52" stroke="url(#rpt-gold)" strokeWidth="3.5" strokeLinecap="round" opacity="0.72"/>
-                <path d="M0 54.5 C10 51 18 59 34 54.5 C50 50 58 57.5 68 54.5" stroke="url(#rpt-blue)" strokeWidth="2.8" strokeLinecap="round"/>
-                <path d="M1 61 C11 58 19 64.5 34 61 C49 57.5 57 63.5 67 61" stroke="url(#rpt-blue)" strokeWidth="1.8" strokeLinecap="round" opacity="0.5"/>
-                <text x="80" y="36" fontFamily="system-ui,-apple-system,sans-serif" fontSize="30" fontWeight="700" letterSpacing="-0.5" fill="#18181b">Arch</text>
-                <text x="143" y="36" fontFamily="system-ui,-apple-system,sans-serif" fontSize="30" fontWeight="700" letterSpacing="-0.5" fill="#2563eb">Flow</text>
-                <text x="81" y="54" fontFamily="system-ui,-apple-system,sans-serif" fontSize="10.5" fontWeight="400" fill="#a1a1aa" letterSpacing="2.5">ARQUITECTURA</text>
-              </svg>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/logo.png" alt="ArchFlow" width={200} height={60} className="mb-4 object-contain" />
               <p className="text-xs text-zinc-400 uppercase tracking-widest mb-2">Informe de Proyecto</p>
               <h1 className="text-3xl font-bold text-zinc-900 leading-tight">{project.name}</h1>
               <div className="flex items-center gap-3 mt-3">

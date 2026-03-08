@@ -48,6 +48,7 @@ export default async function ProjectDetailPage({ params }: { params: { id: stri
     clientName: project.clientName,
     status: project.status,
     phase: project.phase,
+    type: project.type,
   };
 
   const serializedMilestones = milestones.map((m) => ({

@@ -29,6 +29,7 @@ export default function NewProjectPage() {
     description: "",
     status: "planning",
     phase: "concept",
+    type: "administrative",
     location: "",
     startDate: "",
     endDate: "",
@@ -135,8 +136,38 @@ export default function NewProjectPage() {
         </Section>
 
         {/* Estado y Fase */}
-        <Section title="Estado y Fase" description="Estado actual y fase de diseño del proyecto.">
+        <Section title="Estado y Fase" description="Tipo, estado actual y fase de diseño del proyecto.">
           <div className="grid grid-cols-2 gap-4">
+            <Field label="Tipo de Proyecto" className="col-span-2">
+              <div className="flex gap-3">
+                {[
+                  { value: "administrative", label: "Administrativo", desc: "Institucional, público o comercial" },
+                  { value: "personal", label: "Personal", desc: "Encargo privado o residencial" },
+                ].map((t) => (
+                  <label
+                    key={t.value}
+                    className={`flex-1 flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
+                      form.type === t.value
+                        ? "border-amber-500 bg-amber-500/10"
+                        : "border-zinc-700 hover:border-zinc-600"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="type"
+                      value={t.value}
+                      checked={form.type === t.value}
+                      onChange={handleChange}
+                      className="mt-0.5 accent-amber-500"
+                    />
+                    <div>
+                      <p className="text-white text-sm font-medium">{t.label}</p>
+                      <p className="text-zinc-500 text-xs">{t.desc}</p>
+                    </div>
+                  </label>
+                ))}
+              </div>
+            </Field>
             <Field label="Estado">
               <select name="status" value={form.status} onChange={handleChange} className={selectCls}>
                 {statuses.map((s) => (

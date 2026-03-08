@@ -1,5 +1,7 @@
 export type ProjectStatus = "planning" | "in_progress" | "review" | "completed" | "on_hold";
 
+export type ProjectType = "administrative" | "personal";
+
 export type ProjectPhase =
   | "concept"
   | "schematic"
@@ -29,6 +31,7 @@ export interface Project {
   name: string;
   code: string;
   description: string | null;
+  type: ProjectType;
   status: ProjectStatus;
   phase: ProjectPhase;
   location: string | null;

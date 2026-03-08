@@ -14,6 +14,7 @@ interface ProjectData {
   clientName: string;
   status: string;
   phase: string;
+  type: string;
 }
 
 export default function EditProjectModal({ project }: { project: ProjectData }) {
@@ -35,6 +36,7 @@ export default function EditProjectModal({ project }: { project: ProjectData }) 
     clientName: project.clientName,
     status: project.status,
     phase: project.phase,
+    type: project.type,
   });
 
   const handleChange = (
@@ -189,6 +191,37 @@ export default function EditProjectModal({ project }: { project: ProjectData }) 
                   required
                   className={inputCls}
                 />
+              </div>
+
+              <div>
+                <label className="block text-zinc-400 text-xs mb-1.5 uppercase tracking-wide">
+                  Tipo de Proyecto
+                </label>
+                <div className="flex gap-3">
+                  {[
+                    { value: "administrative", label: "Administrativo" },
+                    { value: "personal", label: "Personal" },
+                  ].map((t) => (
+                    <label
+                      key={t.value}
+                      className={`flex-1 flex items-center gap-2 p-2.5 rounded-lg border cursor-pointer transition-colors ${
+                        form.type === t.value
+                          ? "border-amber-500 bg-amber-500/10 text-white"
+                          : "border-zinc-700 text-zinc-400 hover:border-zinc-600"
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="type"
+                        value={t.value}
+                        checked={form.type === t.value}
+                        onChange={handleChange}
+                        className="accent-amber-500"
+                      />
+                      <span className="text-sm font-medium">{t.label}</span>
+                    </label>
+                  ))}
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">

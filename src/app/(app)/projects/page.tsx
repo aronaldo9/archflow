@@ -9,7 +9,7 @@ import ProjectFilters from "@/components/ProjectFilters";
 export default async function ProjectsPage({
   searchParams,
 }: {
-  searchParams: { status?: string; q?: string };
+  searchParams: { status?: string; type?: string; q?: string };
 }) {
   const projects = await getAllProjects();
 
@@ -22,11 +22,19 @@ export default async function ProjectsPage({
     on_hold:     projects.filter((p) => p.status === "on_hold").length,
   };
 
+  const typeCounts = {
+    all:            projects.length,
+    administrative: projects.filter((p) => p.type === "administrative").length,
+    personal:       projects.filter((p) => p.type === "personal").length,
+  };
+
   const status = searchParams.status ?? "all";
+  const type   = searchParams.type   ?? "all";
   const q = (searchParams.q ?? "").toLowerCase().trim();
 
   const filtered = projects.filter((p) => {
     if (status !== "all" && p.status !== status) return false;
+    if (type   !== "all" && p.type   !== type)   return false;
     if (q) {
       const haystack = `${p.name} ${p.code} ${p.clientName} ${p.location ?? ""}`.toLowerCase();
       if (!haystack.includes(q)) return false;
@@ -64,7 +72,7 @@ export default async function ProjectsPage({
           </div>
         }
       >
-        <ProjectFilters counts={counts} />
+        <ProjectFilters counts={counts} typeCounts={typeCounts} />
       </Suspense>
 
       {/* Project cards */}
@@ -96,6 +104,13 @@ export default async function ProjectsPage({
                         {project.code}
                       </span>
                       <StatusBadge status={project.status} />
+                      <span className={`text-xs px-2 py-0.5 rounded font-medium ${
+                        project.type === "personal"
+                          ? "bg-violet-500/15 text-violet-400"
+                          : "bg-sky-500/15 text-sky-400"
+                      }`}>
+                        {project.type === "personal" ? "Personal" : "Administrativo"}
+                      </span>
                     </div>
                     <h3 className="text-white font-semibold text-lg group-hover:text-zinc-100 mb-1">
                       {project.name}

@@ -24,6 +24,7 @@ export async function POST(request: Request) {
       description: body.description || undefined,
       status: body.status ?? "planning",
       phase: body.phase ?? "concept",
+      type: body.type ?? "administrative",
       location: body.location || undefined,
       budget: Number(body.budget) || 0,
       startDate: body.startDate,

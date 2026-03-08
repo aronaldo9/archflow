@@ -32,6 +32,7 @@ export async function PUT(
       clientName: body.clientName,
       status: body.status,
       phase: body.phase,
+      type: body.type,
     });
     await logActivity(params.id, "project_updated", "Proyecto actualizado");
     return NextResponse.json(project);
