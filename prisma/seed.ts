@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
@@ -6,6 +7,13 @@ async function main() {
   // Clear existing data
   await prisma.milestone.deleteMany();
   await prisma.project.deleteMany();
+
+  // Clear users (raw SQL — model added after initial generate)
+  try {
+    await prisma.$executeRaw`DELETE FROM "User"`;
+  } catch {
+    // Table may not exist on first run before migration
+  }
 
   // Project 1 — Hospital de Día Armilla
   const p1 = await prisma.project.create({
@@ -458,90 +466,92 @@ async function main() {
 
   // ── Project images ──────────────────────────────────────────────────────────
   // Stored as Document records with image extension so ProjectGallery picks them up.
-  // Unsplash source URLs (800×600) with &sig=N for deterministic variety.
+  // Unsplash CDN — images.unsplash.com with specific photo IDs, cropped to 800×600.
+  const U = (id: string) => `https://images.unsplash.com/${id}?w=800&h=600&fit=crop&q=80&auto=format`;
+
   type Img = { id: string; name: string; fileUrl: string; projectId: string; uploadedAt: string };
   const imgs: Img[] = [
     // p-001 Hospital de Día Armilla
-    { id: "img-p001-1", projectId: "p-001", name: "Render exterior fachada principal.jpg",        fileUrl: "https://loremflickr.com/800/600/hospital,architecture,modern?lock=101",      uploadedAt: "2024-06-01T10:00:00Z" },
-    { id: "img-p001-2", projectId: "p-001", name: "Vista aérea del conjunto.jpg",                 fileUrl: "https://loremflickr.com/800/600/healthcare,building,exterior?lock=102",       uploadedAt: "2024-06-01T10:01:00Z" },
-    { id: "img-p001-3", projectId: "p-001", name: "Interior vestíbulo de acceso.jpg",             fileUrl: "https://loremflickr.com/800/600/hospital,interior,corridor?lock=103",          uploadedAt: "2024-06-01T10:02:00Z" },
-    { id: "img-p001-4", projectId: "p-001", name: "Avance de obra - estructura.jpg",              fileUrl: "https://loremflickr.com/800/600/construction,concrete,structure?lock=104",  uploadedAt: "2024-09-15T08:30:00Z" },
-    { id: "img-p001-5", projectId: "p-001", name: "Render zonas de rehabilitación.jpg",           fileUrl: "https://loremflickr.com/800/600/medical,architecture,rehabilitation?lock=105",  uploadedAt: "2024-06-01T10:04:00Z" },
+    { id: "img-p001-1", projectId: "p-001", name: "Render exterior fachada principal.jpg",  fileUrl: U("photo-1519494026892-80bbd2d6fd0d"), uploadedAt: "2024-06-01T10:00:00Z" },
+    { id: "img-p001-2", projectId: "p-001", name: "Vista aérea del conjunto.jpg",           fileUrl: U("photo-1586773860418-d37222d8fce3"), uploadedAt: "2024-06-01T10:01:00Z" },
+    { id: "img-p001-3", projectId: "p-001", name: "Interior vestíbulo de acceso.jpg",       fileUrl: U("photo-1504439904031-93ded9f93e4e"), uploadedAt: "2024-06-01T10:02:00Z" },
+    { id: "img-p001-4", projectId: "p-001", name: "Avance de obra - estructura.jpg",        fileUrl: U("photo-1504307651254-35680f356dfd"), uploadedAt: "2024-09-15T08:30:00Z" },
+    { id: "img-p001-5", projectId: "p-001", name: "Render zonas de rehabilitación.jpg",     fileUrl: U("photo-1538108149393-dbbd9eee4f6a"), uploadedAt: "2024-06-01T10:04:00Z" },
 
     // p-002 Complejo Residencial Las Acacias
-    { id: "img-p002-1", projectId: "p-002", name: "Render del conjunto residencial.jpg",          fileUrl: "https://loremflickr.com/800/600/residential,apartments,modern?lock=201",    uploadedAt: "2025-03-01T09:00:00Z" },
-    { id: "img-p002-2", projectId: "p-002", name: "Vista de las zonas ajardinadas.jpg",           fileUrl: "https://loremflickr.com/800/600/apartment,garden,landscape?lock=202",       uploadedAt: "2025-03-01T09:01:00Z" },
-    { id: "img-p002-3", projectId: "p-002", name: "Render interior tipo vivienda.jpg",            fileUrl: "https://loremflickr.com/800/600/apartment,interior,living?lock=203", uploadedAt: "2025-03-01T09:02:00Z" },
-    { id: "img-p002-4", projectId: "p-002", name: "Detalle fachada y balcones.jpg",               fileUrl: "https://loremflickr.com/800/600/facade,balcony,residential?lock=204",       uploadedAt: "2025-03-01T09:03:00Z" },
+    { id: "img-p002-1", projectId: "p-002", name: "Render del conjunto residencial.jpg",    fileUrl: U("photo-1545324418-cc1a3fa10c00"), uploadedAt: "2025-03-01T09:00:00Z" },
+    { id: "img-p002-2", projectId: "p-002", name: "Vista de las zonas ajardinadas.jpg",     fileUrl: U("photo-1558618666-fcd25c85cd64"), uploadedAt: "2025-03-01T09:01:00Z" },
+    { id: "img-p002-3", projectId: "p-002", name: "Render interior tipo vivienda.jpg",      fileUrl: U("photo-1555041469-a586c61ea9bc"), uploadedAt: "2025-03-01T09:02:00Z" },
+    { id: "img-p002-4", projectId: "p-002", name: "Detalle fachada y balcones.jpg",         fileUrl: U("photo-1600607687939-ce8a6c25118c"), uploadedAt: "2025-03-01T09:03:00Z" },
 
     // p-003 Centro Cultural Albolote
-    { id: "img-p003-1", projectId: "p-003", name: "Render exterior fachada cerámica.jpg",         fileUrl: "https://loremflickr.com/800/600/museum,architecture,facade?lock=301",  uploadedAt: "2024-03-01T09:00:00Z" },
-    { id: "img-p003-2", projectId: "p-003", name: "Vista interior del auditorio.jpg",             fileUrl: "https://loremflickr.com/800/600/auditorium,concert,hall?lock=302",      uploadedAt: "2024-03-01T09:01:00Z" },
-    { id: "img-p003-3", projectId: "p-003", name: "Sala de exposiciones.jpg",                     fileUrl: "https://loremflickr.com/800/600/gallery,exhibition,interior?lock=303",       uploadedAt: "2024-03-01T09:02:00Z" },
-    { id: "img-p003-4", projectId: "p-003", name: "Detalle celosías de hormigón.jpg",             fileUrl: "https://loremflickr.com/800/600/concrete,architecture,detail?lock=304",  uploadedAt: "2024-03-01T09:03:00Z" },
-    { id: "img-p003-5", projectId: "p-003", name: "Render nocturno del edificio.jpg",             fileUrl: "https://loremflickr.com/800/600/architecture,night,illuminated?lock=305", uploadedAt: "2024-03-01T09:04:00Z" },
+    { id: "img-p003-1", projectId: "p-003", name: "Render exterior fachada cerámica.jpg",   fileUrl: U("photo-1580587771525-78b9dba3b914"), uploadedAt: "2024-03-01T09:00:00Z" },
+    { id: "img-p003-2", projectId: "p-003", name: "Vista interior del auditorio.jpg",       fileUrl: U("photo-1518998053901-5348d3961a04"), uploadedAt: "2024-03-01T09:01:00Z" },
+    { id: "img-p003-3", projectId: "p-003", name: "Sala de exposiciones.jpg",               fileUrl: U("photo-1536924940846-227afb31e2a5"), uploadedAt: "2024-03-01T09:02:00Z" },
+    { id: "img-p003-4", projectId: "p-003", name: "Detalle celosías de hormigón.jpg",       fileUrl: U("photo-1487958449943-2429e8be8625"), uploadedAt: "2024-03-01T09:03:00Z" },
+    { id: "img-p003-5", projectId: "p-003", name: "Render nocturno del edificio.jpg",       fileUrl: U("photo-1470229722913-7c0e2dbbafd3"), uploadedAt: "2024-03-01T09:04:00Z" },
 
     // p-004 Edificio de Oficinas Parque Tecnológico
-    { id: "img-p004-1", projectId: "p-004", name: "Render exterior fachada ventilada.jpg",        fileUrl: "https://loremflickr.com/800/600/office,building,glass,modern?lock=401",  uploadedAt: "2024-07-01T09:00:00Z" },
-    { id: "img-p004-2", projectId: "p-004", name: "Planta baja espacios colaborativos.jpg",       fileUrl: "https://loremflickr.com/800/600/office,interior,coworking?lock=402",     uploadedAt: "2024-07-01T09:01:00Z" },
-    { id: "img-p004-3", projectId: "p-004", name: "Detalle fachada fotovoltaica.jpg",             fileUrl: "https://loremflickr.com/800/600/solar,panels,building,facade?lock=403", uploadedAt: "2024-07-01T09:02:00Z" },
-    { id: "img-p004-4", projectId: "p-004", name: "Vista desde el parque tecnológico.jpg",        fileUrl: "https://loremflickr.com/800/600/architecture,tech,campus?lock=404",      uploadedAt: "2024-07-01T09:03:00Z" },
-    { id: "img-p004-5", projectId: "p-004", name: "Avance de obra - cimentación.jpg",             fileUrl: "https://loremflickr.com/800/600/construction,foundation,excavation?lock=405",         uploadedAt: "2025-01-20T08:00:00Z" },
+    { id: "img-p004-1", projectId: "p-004", name: "Render exterior fachada ventilada.jpg",  fileUrl: U("photo-1486325212027-8081e485255e"), uploadedAt: "2024-07-01T09:00:00Z" },
+    { id: "img-p004-2", projectId: "p-004", name: "Planta baja espacios colaborativos.jpg", fileUrl: U("photo-1497366216548-37526070297c"), uploadedAt: "2024-07-01T09:01:00Z" },
+    { id: "img-p004-3", projectId: "p-004", name: "Detalle fachada fotovoltaica.jpg",       fileUrl: U("photo-1509391366360-2e959784a276"), uploadedAt: "2024-07-01T09:02:00Z" },
+    { id: "img-p004-4", projectId: "p-004", name: "Vista desde el parque tecnológico.jpg",  fileUrl: U("photo-1464938050520-ef2270bb8ce8"), uploadedAt: "2024-07-01T09:03:00Z" },
+    { id: "img-p004-5", projectId: "p-004", name: "Avance de obra - cimentación.jpg",       fileUrl: U("photo-1503387762-592deb58ef4e"), uploadedAt: "2025-01-20T08:00:00Z" },
 
     // p-005 Centro Logístico Sur
-    { id: "img-p005-1", projectId: "p-005", name: "Vista aérea del centro logístico.jpg",         fileUrl: "https://loremflickr.com/800/600/warehouse,aerial,industrial?lock=501", uploadedAt: "2023-05-01T09:00:00Z" },
-    { id: "img-p005-2", projectId: "p-005", name: "Interior nave de almacenamiento.jpg",          fileUrl: "https://loremflickr.com/800/600/warehouse,interior,storage?lock=502", uploadedAt: "2023-05-01T09:01:00Z" },
-    { id: "img-p005-3", projectId: "p-005", name: "Cubierta solar fotovoltaica.jpg",              fileUrl: "https://loremflickr.com/800/600/solar,panels,roof,industrial?lock=503",          uploadedAt: "2023-05-01T09:02:00Z" },
-    { id: "img-p005-4", projectId: "p-005", name: "Muelles de carga automatizados.jpg",           fileUrl: "https://loremflickr.com/800/600/loading,dock,logistics?lock=504",     uploadedAt: "2023-05-01T09:03:00Z" },
-    { id: "img-p005-5", projectId: "p-005", name: "Fachada principal del complejo.jpg",           fileUrl: "https://loremflickr.com/800/600/industrial,building,facade?lock=505",     uploadedAt: "2023-05-01T09:04:00Z" },
-    { id: "img-p005-6", projectId: "p-005", name: "Urbanización exterior.jpg",                    fileUrl: "https://loremflickr.com/800/600/industrial,exterior,road?lock=506",    uploadedAt: "2024-09-01T08:00:00Z" },
+    { id: "img-p005-1", projectId: "p-005", name: "Vista aérea del centro logístico.jpg",   fileUrl: U("photo-1586528116311-ad8dd3c8310d"), uploadedAt: "2023-05-01T09:00:00Z" },
+    { id: "img-p005-2", projectId: "p-005", name: "Interior nave de almacenamiento.jpg",    fileUrl: U("photo-1553413077-190dd305871c"), uploadedAt: "2023-05-01T09:01:00Z" },
+    { id: "img-p005-3", projectId: "p-005", name: "Cubierta solar fotovoltaica.jpg",        fileUrl: U("photo-1509391366360-2e959784a276"), uploadedAt: "2023-05-01T09:02:00Z" },
+    { id: "img-p005-4", projectId: "p-005", name: "Muelles de carga automatizados.jpg",     fileUrl: U("photo-1565793979946-06c9dcd7a7b5"), uploadedAt: "2023-05-01T09:03:00Z" },
+    { id: "img-p005-5", projectId: "p-005", name: "Fachada principal del complejo.jpg",     fileUrl: U("photo-1515263487990-61b07816b324"), uploadedAt: "2023-05-01T09:04:00Z" },
+    { id: "img-p005-6", projectId: "p-005", name: "Urbanización exterior.jpg",              fileUrl: U("photo-1504307651254-35680f356dfd"), uploadedAt: "2024-09-01T08:00:00Z" },
 
     // p-006 Polideportivo Municipal Huétor Vega
-    { id: "img-p006-1", projectId: "p-006", name: "Render exterior pabellón deportivo.jpg",       fileUrl: "https://loremflickr.com/800/600/sports,hall,architecture?lock=601",       uploadedAt: "2025-02-01T09:00:00Z" },
-    { id: "img-p006-2", projectId: "p-006", name: "Estructura de cubierta en CLT.jpg",            fileUrl: "https://loremflickr.com/800/600/timber,wood,structure,roof?lock=602",    uploadedAt: "2025-02-01T09:01:00Z" },
-    { id: "img-p006-3", projectId: "p-006", name: "Render piscina cubierta interior.jpg",         fileUrl: "https://loremflickr.com/800/600/swimming,pool,indoor,sports?lock=603",            uploadedAt: "2025-02-01T09:02:00Z" },
-    { id: "img-p006-4", projectId: "p-006", name: "Render sala de fitness.jpg",                   fileUrl: "https://loremflickr.com/800/600/gym,fitness,interior,modern?lock=604",            uploadedAt: "2025-02-01T09:03:00Z" },
+    { id: "img-p006-1", projectId: "p-006", name: "Render exterior pabellón deportivo.jpg", fileUrl: U("photo-1546519638-68e109498ffc"), uploadedAt: "2025-02-01T09:00:00Z" },
+    { id: "img-p006-2", projectId: "p-006", name: "Estructura de cubierta en CLT.jpg",      fileUrl: U("photo-1505761671935-60b3a7427bad"), uploadedAt: "2025-02-01T09:01:00Z" },
+    { id: "img-p006-3", projectId: "p-006", name: "Render piscina cubierta interior.jpg",   fileUrl: U("photo-1576013551627-0cc20b96c2a7"), uploadedAt: "2025-02-01T09:02:00Z" },
+    { id: "img-p006-4", projectId: "p-006", name: "Render sala de fitness.jpg",             fileUrl: U("photo-1534438327276-14e5300c3a48"), uploadedAt: "2025-02-01T09:03:00Z" },
 
     // p-007 Residencia de Estudiantes UGR
-    { id: "img-p007-1", projectId: "p-007", name: "Render del conjunto residencial.jpg",          fileUrl: "https://loremflickr.com/800/600/student,housing,university?lock=701", uploadedAt: "2024-03-01T09:00:00Z" },
-    { id: "img-p007-2", projectId: "p-007", name: "Patio central bioclimático.jpg",               fileUrl: "https://loremflickr.com/800/600/courtyard,architecture,modern?lock=702", uploadedAt: "2024-03-01T09:01:00Z" },
-    { id: "img-p007-3", projectId: "p-007", name: "Interior habitación tipo.jpg",                 fileUrl: "https://loremflickr.com/800/600/bedroom,interior,minimal,modern?lock=703",           uploadedAt: "2024-03-01T09:02:00Z" },
-    { id: "img-p007-4", projectId: "p-007", name: "Avance de obra - estructura.jpg",              fileUrl: "https://loremflickr.com/800/600/construction,building,progress?lock=704", uploadedAt: "2025-04-01T08:00:00Z" },
-    { id: "img-p007-5", projectId: "p-007", name: "Render comedor universitario.jpg",             fileUrl: "https://loremflickr.com/800/600/cafeteria,university,interior?lock=705",    uploadedAt: "2024-03-01T09:04:00Z" },
+    { id: "img-p007-1", projectId: "p-007", name: "Render del conjunto residencial.jpg",    fileUrl: U("photo-1564013799919-ab600027ffc6"), uploadedAt: "2024-03-01T09:00:00Z" },
+    { id: "img-p007-2", projectId: "p-007", name: "Patio central bioclimático.jpg",         fileUrl: U("photo-1512917774080-9991f1c4c750"), uploadedAt: "2024-03-01T09:01:00Z" },
+    { id: "img-p007-3", projectId: "p-007", name: "Interior habitación tipo.jpg",           fileUrl: U("photo-1540518614846-7eded433c457"), uploadedAt: "2024-03-01T09:02:00Z" },
+    { id: "img-p007-4", projectId: "p-007", name: "Avance de obra - estructura.jpg",        fileUrl: U("photo-1503387762-592deb58ef4e"), uploadedAt: "2025-04-01T08:00:00Z" },
+    { id: "img-p007-5", projectId: "p-007", name: "Render comedor universitario.jpg",       fileUrl: U("photo-1567521464027-f127ff144326"), uploadedAt: "2024-03-01T09:04:00Z" },
 
     // p-008 Casa Consistorial Santa Fe
-    { id: "img-p008-1", projectId: "p-008", name: "Fachada histórica del edificio.jpg",           fileUrl: "https://loremflickr.com/800/600/townhall,historic,architecture?lock=801",  uploadedAt: "2024-07-01T09:00:00Z" },
-    { id: "img-p008-2", projectId: "p-008", name: "Interior sala de plenos.jpg",                  fileUrl: "https://loremflickr.com/800/600/historic,interior,hall,ornate?lock=802",            uploadedAt: "2024-07-01T09:01:00Z" },
-    { id: "img-p008-3", projectId: "p-008", name: "Detalle elementos históricos.jpg",             fileUrl: "https://loremflickr.com/800/600/restoration,heritage,stonework?lock=803", uploadedAt: "2024-07-01T09:02:00Z" },
-    { id: "img-p008-4", projectId: "p-008", name: "Render ala contemporánea.jpg",                 fileUrl: "https://loremflickr.com/800/600/contemporary,architecture,modern?lock=804", uploadedAt: "2024-07-01T09:03:00Z" },
+    { id: "img-p008-1", projectId: "p-008", name: "Fachada histórica del edificio.jpg",     fileUrl: U("photo-1477959858617-67f85cf4f1df"), uploadedAt: "2024-07-01T09:00:00Z" },
+    { id: "img-p008-2", projectId: "p-008", name: "Interior sala de plenos.jpg",            fileUrl: U("photo-1541888946425-d81bb19240f5"), uploadedAt: "2024-07-01T09:01:00Z" },
+    { id: "img-p008-3", projectId: "p-008", name: "Detalle elementos históricos.jpg",       fileUrl: U("photo-1558618666-fcd25c85cd64"), uploadedAt: "2024-07-01T09:02:00Z" },
+    { id: "img-p008-4", projectId: "p-008", name: "Render ala contemporánea.jpg",           fileUrl: U("photo-1487958449943-2429e8be8625"), uploadedAt: "2024-07-01T09:03:00Z" },
 
     // p-009 Centro de Salud Churriana de la Vega
-    { id: "img-p009-1", projectId: "p-009", name: "Render exterior centro de salud.jpg",          fileUrl: "https://loremflickr.com/800/600/healthcare,building,modern?lock=901",  uploadedAt: "2024-01-20T09:00:00Z" },
-    { id: "img-p009-2", projectId: "p-009", name: "Interior sala de espera.jpg",                  fileUrl: "https://loremflickr.com/800/600/waiting,room,healthcare,interior?lock=902", uploadedAt: "2024-01-20T09:01:00Z" },
-    { id: "img-p009-3", projectId: "p-009", name: "Vista fachada principal.jpg",                  fileUrl: "https://loremflickr.com/800/600/medical,building,facade?lock=903",           uploadedAt: "2024-01-20T09:02:00Z" },
-    { id: "img-p009-4", projectId: "p-009", name: "Zona consultas médicas.jpg",                   fileUrl: "https://loremflickr.com/800/600/medical,office,interior?lock=904",       uploadedAt: "2024-01-20T09:03:00Z" },
+    { id: "img-p009-1", projectId: "p-009", name: "Render exterior centro de salud.jpg",    fileUrl: U("photo-1586773860418-d37222d8fce3"), uploadedAt: "2024-01-20T09:00:00Z" },
+    { id: "img-p009-2", projectId: "p-009", name: "Interior sala de espera.jpg",            fileUrl: U("photo-1538108149393-dbbd9eee4f6a"), uploadedAt: "2024-01-20T09:01:00Z" },
+    { id: "img-p009-3", projectId: "p-009", name: "Vista fachada principal.jpg",            fileUrl: U("photo-1519494026892-80bbd2d6fd0d"), uploadedAt: "2024-01-20T09:02:00Z" },
+    { id: "img-p009-4", projectId: "p-009", name: "Zona consultas médicas.jpg",             fileUrl: U("photo-1504439904031-93ded9f93e4e"), uploadedAt: "2024-01-20T09:03:00Z" },
 
     // p-010 Vivienda Unifamiliar Cenes de la Vega
-    { id: "img-p010-1", projectId: "p-010", name: "Render exterior vivienda.jpg",                 fileUrl: "https://loremflickr.com/800/600/house,architecture,modern,exterior?lock=1001", uploadedAt: "2025-02-01T09:00:00Z" },
-    { id: "img-p010-2", projectId: "p-010", name: "Fachada sur con terraza.jpg",                  fileUrl: "https://loremflickr.com/800/600/villa,terrace,modern,outdoor?lock=1002",   uploadedAt: "2025-02-01T09:01:00Z" },
-    { id: "img-p010-3", projectId: "p-010", name: "Interior salón con vistas.jpg",                fileUrl: "https://loremflickr.com/800/600/living,room,interior,modern?lock=1003",     uploadedAt: "2025-02-01T09:02:00Z" },
-    { id: "img-p010-4", projectId: "p-010", name: "Render cocina.jpg",                            fileUrl: "https://loremflickr.com/800/600/kitchen,modern,interior,design?lock=1004", uploadedAt: "2025-02-01T09:03:00Z" },
-    { id: "img-p010-5", projectId: "p-010", name: "Cubierta transitable con pérgola.jpg",         fileUrl: "https://loremflickr.com/800/600/rooftop,pergola,outdoor,modern?lock=1005", uploadedAt: "2025-02-01T09:04:00Z" },
-    { id: "img-p010-6", projectId: "p-010", name: "Vista del jardín trasero.jpg",                 fileUrl: "https://loremflickr.com/800/600/garden,house,landscape,outdoor?lock=1006",      uploadedAt: "2025-02-01T09:05:00Z" },
+    { id: "img-p010-1", projectId: "p-010", name: "Render exterior vivienda.jpg",           fileUrl: U("photo-1600585154340-be6161a56a0c"), uploadedAt: "2025-02-01T09:00:00Z" },
+    { id: "img-p010-2", projectId: "p-010", name: "Fachada sur con terraza.jpg",            fileUrl: U("photo-1560185007-cde436f6a4d0"), uploadedAt: "2025-02-01T09:01:00Z" },
+    { id: "img-p010-3", projectId: "p-010", name: "Interior salón con vistas.jpg",          fileUrl: U("photo-1600210492493-0946911123ea"), uploadedAt: "2025-02-01T09:02:00Z" },
+    { id: "img-p010-4", projectId: "p-010", name: "Render cocina.jpg",                      fileUrl: U("photo-1556909114-f6e7ad7d3136"), uploadedAt: "2025-02-01T09:03:00Z" },
+    { id: "img-p010-5", projectId: "p-010", name: "Cubierta transitable con pérgola.jpg",   fileUrl: U("photo-1600566753086-00f18fb6b3ea"), uploadedAt: "2025-02-01T09:04:00Z" },
+    { id: "img-p010-6", projectId: "p-010", name: "Vista del jardín trasero.jpg",           fileUrl: U("photo-1558618666-fcd25c85cd64"), uploadedAt: "2025-02-01T09:05:00Z" },
 
     // p-011 Rehabilitación Chalet La Zubia
-    { id: "img-p011-1", projectId: "p-011", name: "Fachada antes de la rehabilitación.jpg",       fileUrl: "https://loremflickr.com/800/600/house,renovation,before,old?lock=1101",  uploadedAt: "2024-03-05T08:00:00Z" },
-    { id: "img-p011-2", projectId: "p-011", name: "Fachada tras la rehabilitación.jpg",           fileUrl: "https://loremflickr.com/800/600/house,renovation,modern,after?lock=1102", uploadedAt: "2024-12-22T10:00:00Z" },
-    { id: "img-p011-3", projectId: "p-011", name: "Interior cocina reformada.jpg",                fileUrl: "https://loremflickr.com/800/600/kitchen,renovation,modern,bright?lock=1103",   uploadedAt: "2024-12-22T10:01:00Z" },
-    { id: "img-p011-4", projectId: "p-011", name: "Jardín trasero con piscina.jpg",               fileUrl: "https://loremflickr.com/800/600/garden,pool,outdoor,house?lock=1104",    uploadedAt: "2024-12-22T10:02:00Z" },
-    { id: "img-p011-5", projectId: "p-011", name: "Detalle carpintería nueva.jpg",                fileUrl: "https://loremflickr.com/800/600/window,door,architecture,modern?lock=1105",   uploadedAt: "2024-12-22T10:03:00Z" },
+    { id: "img-p011-1", projectId: "p-011", name: "Fachada antes de la rehabilitación.jpg", fileUrl: U("photo-1484154218962-a197022b5858"), uploadedAt: "2024-03-05T08:00:00Z" },
+    { id: "img-p011-2", projectId: "p-011", name: "Fachada tras la rehabilitación.jpg",     fileUrl: U("photo-1600585154340-be6161a56a0c"), uploadedAt: "2024-12-22T10:00:00Z" },
+    { id: "img-p011-3", projectId: "p-011", name: "Interior cocina reformada.jpg",          fileUrl: U("photo-1556909114-f6e7ad7d3136"), uploadedAt: "2024-12-22T10:01:00Z" },
+    { id: "img-p011-4", projectId: "p-011", name: "Jardín trasero con piscina.jpg",         fileUrl: U("photo-1576013551627-0cc20b96c2a7"), uploadedAt: "2024-12-22T10:02:00Z" },
+    { id: "img-p011-5", projectId: "p-011", name: "Detalle carpintería nueva.jpg",          fileUrl: U("photo-1600210492493-0946911123ea"), uploadedAt: "2024-12-22T10:03:00Z" },
 
     // p-012 Casa en el Campo Iznalloz
-    { id: "img-p012-1", projectId: "p-012", name: "Render exterior casa rural.jpg",               fileUrl: "https://loremflickr.com/800/600/rural,house,architecture,stone?lock=1201",  uploadedAt: "2025-06-15T09:00:00Z" },
-    { id: "img-p012-2", projectId: "p-012", name: "Vista integración en el paisaje.jpg",          fileUrl: "https://loremflickr.com/800/600/landscape,rural,house,nature?lock=1202", uploadedAt: "2025-06-15T09:01:00Z" },
-    { id: "img-p012-3", projectId: "p-012", name: "Render interior zona de día.jpg",              fileUrl: "https://loremflickr.com/800/600/interior,house,modern,open,living?lock=1203",   uploadedAt: "2025-06-15T09:02:00Z" },
-    { id: "img-p012-4", projectId: "p-012", name: "Cubierta ajardinada.jpg",                      fileUrl: "https://loremflickr.com/800/600/green,roof,architecture,sustainable?lock=1204", uploadedAt: "2025-06-15T09:03:00Z" },
-    { id: "img-p012-5", projectId: "p-012", name: "Render terraza hacia la sierra.jpg",           fileUrl: "https://loremflickr.com/800/600/terrace,mountain,view,house?lock=1205", uploadedAt: "2025-06-15T09:04:00Z" },
+    { id: "img-p012-1", projectId: "p-012", name: "Render exterior casa rural.jpg",         fileUrl: U("photo-1500534314209-a157d0ea4e39"), uploadedAt: "2025-06-15T09:00:00Z" },
+    { id: "img-p012-2", projectId: "p-012", name: "Vista integración en el paisaje.jpg",    fileUrl: U("photo-1464822759023-fed622ff2c3b"), uploadedAt: "2025-06-15T09:01:00Z" },
+    { id: "img-p012-3", projectId: "p-012", name: "Render interior zona de día.jpg",        fileUrl: U("photo-1600210492493-0946911123ea"), uploadedAt: "2025-06-15T09:02:00Z" },
+    { id: "img-p012-4", projectId: "p-012", name: "Cubierta ajardinada.jpg",                fileUrl: U("photo-1416879595882-3373a0480b5b"), uploadedAt: "2025-06-15T09:03:00Z" },
+    { id: "img-p012-5", projectId: "p-012", name: "Render terraza hacia la sierra.jpg",     fileUrl: U("photo-1506905925346-21bda4d32df4"), uploadedAt: "2025-06-15T09:04:00Z" },
   ];
 
   for (const img of imgs) {
@@ -552,7 +562,64 @@ async function main() {
   }
 
   console.log(`✓ ${imgs.length} imágenes de proyecto insertadas`);
-  console.log("✓ Base de datos inicializada con 12 proyectos en el área metropolitana de Granada (9 administrativos + 3 personales)");
+
+  // ── Users ────────────────────────────────────────────────────────────────────
+  const SALT_ROUNDS = 12;
+  const clientPass = await bcrypt.hash("Cliente1234!", SALT_ROUNDS);
+
+  const users = [
+    // ── Admin ──
+    {
+      id: "user-admin-001",
+      email: "admin@archflow.es",
+      password: await bcrypt.hash("Admin1234!", SALT_ROUNDS),
+      name: "Administrador",
+      role: "admin",
+      projectId: null,
+    },
+    // ── Demo ──
+    {
+      id: "user-normal-001",
+      email: "visita@archflow.es",
+      password: await bcrypt.hash("Visita1234!", SALT_ROUNDS),
+      name: "Usuario Demo",
+      role: "normal",
+      projectId: null,
+    },
+    // ── Clientes (uno por proyecto) ──
+    { id: "user-client-001", email: "hda@juntasalud.es",         password: clientPass, name: "Junta de Andalucía — Salud (HDA)",   role: "client", projectId: "p-001" },
+    { id: "user-client-002", email: "info@veganorte.es",          password: clientPass, name: "Promociones Vega Norte S.L.",         role: "client", projectId: "p-002" },
+    { id: "user-client-003", email: "urbanismo@albolote.es",      password: clientPass, name: "Ayuntamiento de Albolote",            role: "client", projectId: "p-003" },
+    { id: "user-client-004", email: "proyectos@techvega.es",      password: clientPass, name: "TechVega Inversiones S.A.",           role: "client", projectId: "p-004" },
+    { id: "user-client-005", email: "construccion@logisur.es",    password: clientPass, name: "LogiSur Granada S.A.",                role: "client", projectId: "p-005" },
+    { id: "user-client-006", email: "deportes@huetorvega.es",     password: clientPass, name: "Ayuntamiento de Huétor Vega",         role: "client", projectId: "p-006" },
+    { id: "user-client-007", email: "infraestructuras@ugr.es",    password: clientPass, name: "Universidad de Granada",              role: "client", projectId: "p-007" },
+    { id: "user-client-008", email: "secretaria@santafe.es",      password: clientPass, name: "Ayuntamiento de Santa Fe",           role: "client", projectId: "p-008" },
+    { id: "user-client-009", email: "csc@juntasalud.es",          password: clientPass, name: "Junta de Andalucía — Salud (CSC)",   role: "client", projectId: "p-009" },
+    { id: "user-client-010", email: "jmorales@gmail.com",         password: clientPass, name: "Familia Morales Ruiz",                role: "client", projectId: "p-010" },
+    { id: "user-client-011", email: "cvilchez@hotmail.com",       password: clientPass, name: "Dña. Carmen Vílchez Soto",           role: "client", projectId: "p-011" },
+    { id: "user-client-012", email: "acastillo@outlook.es",       password: clientPass, name: "D. Andrés Castillo Peña",            role: "client", projectId: "p-012" },
+  ];
+
+  for (const u of users) {
+    await prisma.$executeRaw`
+      INSERT INTO "User" (id, email, password, name, role, projectId, createdAt, updatedAt)
+      VALUES (${u.id}, ${u.email}, ${u.password}, ${u.name}, ${u.role}, ${u.projectId}, datetime('now'), datetime('now'))
+    `;
+  }
+
+  const clientUsers = users.filter((u) => u.role === "client");
+  console.log(`✓ ${users.length} usuarios creados (1 admin + 1 demo + ${clientUsers.length} clientes)`);
+  console.log("");
+  console.log("  ADMIN:");
+  console.log("    admin@archflow.es         →  Admin1234!");
+  console.log("");
+  console.log("  CLIENTES (todos usan: Cliente1234!):");
+  for (const u of clientUsers) {
+    console.log(`    ${u.email.padEnd(32)} →  p-${u.projectId?.split("-")[1]} · ${u.name}`);
+  }
+  console.log("");
+  console.log("✓ Base de datos inicializada con 12 proyectos en el área metropolitana de Granada");
 }
 
 main()

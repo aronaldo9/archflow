@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -83,4 +83,15 @@ model TeamMember {
   createdAt DateTime @default(now())
   projectId String
   project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      String   @default("normal") // admin | client | normal
+  projectId String?  // for client users — linked project
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

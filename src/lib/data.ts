@@ -33,7 +33,7 @@ export async function getProjectById(id: string) {
 export async function getDocumentsByProject(projectId: string) {
   return prisma.$queryRaw<
     { id: string; name: string; fileUrl: string; uploadedAt: string; projectId: string }[]
-  >`SELECT id, name, fileUrl, uploadedAt, projectId FROM "Document" WHERE projectId = ${projectId} ORDER BY uploadedAt DESC`;
+  >`SELECT id, name, "fileUrl", "uploadedAt", "projectId" FROM "Document" WHERE "projectId" = ${projectId} ORDER BY "uploadedAt" DESC`;
 }
 
 export async function getProjectStats() {
@@ -197,12 +197,12 @@ export async function createDocument(
 ) {
   // Use raw SQL — Prisma client may not yet include Document after migration
   const id = `d${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`;
-  const uploadedAt = new Date().toISOString();
+  const uploadedAt = new Date();
   await prisma.$executeRaw`
-    INSERT INTO "Document" (id, name, fileUrl, uploadedAt, projectId)
+    INSERT INTO "Document" (id, name, "fileUrl", "uploadedAt", "projectId")
     VALUES (${id}, ${data.name}, ${data.fileUrl}, ${uploadedAt}, ${projectId})
   `;
-  return { id, name: data.name, fileUrl: data.fileUrl, uploadedAt, projectId };
+  return { id, name: data.name, fileUrl: data.fileUrl, uploadedAt: uploadedAt.toISOString(), projectId };
 }
 
 export async function deleteDocument(id: string) {
@@ -212,7 +212,7 @@ export async function deleteDocument(id: string) {
 export async function findDocumentById(id: string) {
   const rows = await prisma.$queryRaw<
     { id: string; name: string; fileUrl: string; uploadedAt: string; projectId: string }[]
-  >`SELECT id, name, fileUrl, uploadedAt, projectId FROM "Document" WHERE id = ${id} LIMIT 1`;
+  >`SELECT id, name, "fileUrl", "uploadedAt", "projectId" FROM "Document" WHERE id = ${id} LIMIT 1`;
   return rows[0] ?? null;
 }
 
@@ -221,7 +221,7 @@ export async function findDocumentById(id: string) {
 export async function getExpensesByProject(projectId: string) {
   return prisma.$queryRaw<
     { id: string; description: string; amount: number; category: string; date: string; createdAt: string; projectId: string }[]
-  >`SELECT id, description, amount, category, date, createdAt, projectId FROM "Expense" WHERE projectId = ${projectId} ORDER BY date DESC`;
+  >`SELECT id, description, amount, category, date, "createdAt", "projectId" FROM "Expense" WHERE "projectId" = ${projectId} ORDER BY date DESC`;
 }
 
 export async function createExpense(
@@ -229,13 +229,13 @@ export async function createExpense(
   data: { description: string; amount: number; category: string; date: string }
 ) {
   const id = `exp${Date.now().toString(36)}${Math.random().toString(36).slice(2, 7)}`;
-  const createdAt = new Date().toISOString();
-  const date = new Date(data.date).toISOString();
+  const createdAt = new Date();
+  const date = new Date(data.date);
   await prisma.$executeRaw`
-    INSERT INTO "Expense" (id, description, amount, category, date, createdAt, projectId)
+    INSERT INTO "Expense" (id, description, amount, category, date, "createdAt", "projectId")
     VALUES (${id}, ${data.description}, ${data.amount}, ${data.category}, ${date}, ${createdAt}, ${projectId})
   `;
-  return { id, description: data.description, amount: data.amount, category: data.category, date, createdAt, projectId };
+  return { id, description: data.description, amount: data.amount, category: data.category, date: date.toISOString(), createdAt: createdAt.toISOString(), projectId };
 }
 
 export async function deleteExpense(id: string) {
@@ -247,9 +247,9 @@ export async function deleteExpense(id: string) {
 export async function logActivity(projectId: string, type: string, description: string) {
   try {
     const id = `act${Date.now().toString(36)}${Math.random().toString(36).slice(2, 7)}`;
-    const createdAt = new Date().toISOString();
+    const createdAt = new Date();
     await prisma.$executeRaw`
-      INSERT INTO "ActivityLog" (id, type, description, createdAt, projectId)
+      INSERT INTO "ActivityLog" (id, type, description, "createdAt", "projectId")
       VALUES (${id}, ${type}, ${description}, ${createdAt}, ${projectId})
     `;
   } catch {
@@ -260,17 +260,17 @@ export async function logActivity(projectId: string, type: string, description: 
 export async function getActivityByProject(projectId: string, limit = 20) {
   const rows = await prisma.$queryRaw<
     { id: string; type: string; description: string; createdAt: string; projectId: string }[]
-  >`SELECT id, type, description, createdAt, projectId FROM "ActivityLog" WHERE projectId = ${projectId} ORDER BY createdAt DESC`;
+  >`SELECT id, type, description, "createdAt", "projectId" FROM "ActivityLog" WHERE "projectId" = ${projectId} ORDER BY "createdAt" DESC`;
   return rows.slice(0, limit);
 }
 
 export async function getRecentActivity(limit = 12) {
   const rows = await prisma.$queryRaw<
     { id: string; type: string; description: string; createdAt: string; projectId: string; projectName: string; projectCode: string }[]
-  >`SELECT a.id, a.type, a.description, a.createdAt, a.projectId,
-           p.name as projectName, p.code as projectCode
-    FROM "ActivityLog" a JOIN "Project" p ON p.id = a.projectId
-    ORDER BY a.createdAt DESC`;
+  >`SELECT a.id, a.type, a.description, a."createdAt", a."projectId",
+           p.name as "projectName", p.code as "projectCode"
+    FROM "ActivityLog" a JOIN "Project" p ON p.id = a."projectId"
+    ORDER BY a."createdAt" DESC`;
   return rows.slice(0, limit);
 }
 
@@ -279,7 +279,7 @@ export async function getRecentActivity(limit = 12) {
 export async function getTeamByProject(projectId: string) {
   return prisma.$queryRaw<
     { id: string; name: string; role: string; email: string | null; phone: string | null; createdAt: string; projectId: string }[]
-  >`SELECT id, name, role, email, phone, createdAt, projectId FROM "TeamMember" WHERE projectId = ${projectId} ORDER BY createdAt ASC`;
+  >`SELECT id, name, role, email, phone, "createdAt", "projectId" FROM "TeamMember" WHERE "projectId" = ${projectId} ORDER BY "createdAt" ASC`;
 }
 
 export async function createTeamMember(
@@ -287,14 +287,14 @@ export async function createTeamMember(
   data: { name: string; role: string; email?: string; phone?: string }
 ) {
   const id = `tm${Date.now().toString(36)}${Math.random().toString(36).slice(2, 7)}`;
-  const createdAt = new Date().toISOString();
+  const createdAt = new Date();
   const email = data.email ?? null;
   const phone = data.phone ?? null;
   await prisma.$executeRaw`
-    INSERT INTO "TeamMember" (id, name, role, email, phone, createdAt, projectId)
+    INSERT INTO "TeamMember" (id, name, role, email, phone, "createdAt", "projectId")
     VALUES (${id}, ${data.name}, ${data.role}, ${email}, ${phone}, ${createdAt}, ${projectId})
   `;
-  return { id, name: data.name, role: data.role, email, phone, createdAt, projectId };
+  return { id, name: data.name, role: data.role, email, phone, createdAt: createdAt.toISOString(), projectId };
 }
 
 export async function deleteTeamMember(id: string) {

@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -49,8 +48,26 @@ export default function Sidebar() {
   return (
     <aside className="fixed inset-y-0 left-0 w-64 bg-zinc-950 border-r border-zinc-800 flex flex-col z-30">
       {/* Logo */}
-      <div className="h-16 flex items-center justify-center border-b border-zinc-800" style={{ padding: "2px" }}>
-        <Image src="/logo.png" alt="ArchFlow" width={240} height={60} className="h-full w-auto object-contain" priority />
+      <div className="h-16 flex items-center justify-center border-b border-zinc-800 px-4">
+        <svg width="192" height="48" viewBox="0 0 192 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="ArchFlow">
+          <defs>
+            <linearGradient id="sb-gold" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#fbbf24" />
+              <stop offset="100%" stopColor="#d97706" />
+            </linearGradient>
+            <linearGradient id="sb-blue" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stopColor="#38bdf8" />
+              <stop offset="100%" stopColor="#0ea5e9" />
+            </linearGradient>
+          </defs>
+          <path d="M8 38 L8 22 Q8 10 18 10 Q28 10 28 22 L28 38" stroke="url(#sb-gold)" strokeWidth="3" fill="none" strokeLinecap="round"/>
+          <path d="M20 38 L20 18 Q20 4 32 4 Q44 4 44 18 L44 38" stroke="url(#sb-gold)" strokeWidth="3" fill="none" strokeLinecap="round"/>
+          <path d="M4 42 Q10 38 16 42 Q22 46 28 42 Q34 38 40 42 Q46 46 52 42" stroke="url(#sb-blue)" strokeWidth="2" fill="none" strokeLinecap="round"/>
+          <path d="M4 46 Q10 42 16 46 Q22 50 28 46 Q34 42 40 46 Q46 50 52 46" stroke="url(#sb-blue)" strokeWidth="1.5" fill="none" strokeLinecap="round" opacity="0.6"/>
+          <text x="60" y="30" fontFamily="system-ui, sans-serif" fontWeight="700" fontSize="22" fill="white">Arch</text>
+          <text x="101" y="30" fontFamily="system-ui, sans-serif" fontWeight="700" fontSize="22" fill="#38bdf8">Flow</text>
+          <text x="60" y="44" fontFamily="system-ui, sans-serif" fontWeight="400" fontSize="9" fill="#71717a" letterSpacing="2">ARQUITECTURA</text>
+        </svg>
       </div>
 
       {/* Nav */}
