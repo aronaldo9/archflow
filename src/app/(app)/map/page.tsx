@@ -1,9 +1,9 @@
-import dynamic from "next/dynamic";
+import nextDynamic from "next/dynamic";
 import { getProjectsForMap } from "@/lib/data";
 
 export const dynamic = "force-dynamic";
 
-const ProjectMap = dynamic(() => import("@/components/ProjectMap"), {
+const ProjectMap = nextDynamic(() => import("@/components/ProjectMap"), {
   ssr: false,
   loading: () => (
     <div className="h-full flex items-center justify-center bg-zinc-900 rounded-xl">
