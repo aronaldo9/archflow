@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -42,6 +43,7 @@ export default function LoginPage() {
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="flex justify-center mb-8">
+          <Link href="/">
           <svg width="192" height="48" viewBox="0 0 192 48" fill="none" xmlns="http://www.w3.org/2000/svg">
             <defs>
               <linearGradient id="lg-gold" x1="0" y1="0" x2="0" y2="1">
@@ -65,6 +67,7 @@ export default function LoginPage() {
             <text x="101" y="30" fontFamily="system-ui, sans-serif" fontWeight="700" fontSize="22" fill="#38bdf8">Flow</text>
             <text x="60" y="44" fontFamily="system-ui, sans-serif" fontWeight="400" fontSize="9" fill="#71717a" letterSpacing="2">ARQUITECTURA</text>
           </svg>
+          </Link>
         </div>
 
         {/* Card */}
@@ -115,7 +118,13 @@ export default function LoginPage() {
           </form>
         </div>
 
-        <p className="text-center text-zinc-600 text-xs mt-6">
+        <p className="text-center mt-5">
+          <Link href="/" className="text-zinc-500 hover:text-zinc-300 text-sm transition-colors">
+            ← Volver al inicio
+          </Link>
+        </p>
+
+        <p className="text-center text-zinc-600 text-xs mt-4">
           © {new Date().getFullYear()} ArchFlow · Todos los derechos reservados
         </p>
       </div>
