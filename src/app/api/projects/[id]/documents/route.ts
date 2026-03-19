@@ -3,6 +3,8 @@ import { writeFile, mkdir } from "fs/promises";
 import path from "path";
 import { createDocument, logActivity } from "@/lib/data";
 
+export const dynamic = "force-dynamic";
+
 export async function POST(
   request: Request,
   { params }: { params: { id: string } }

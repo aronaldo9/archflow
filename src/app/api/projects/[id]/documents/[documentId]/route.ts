@@ -3,6 +3,8 @@ import { unlink } from "fs/promises";
 import path from "path";
 import { findDocumentById, deleteDocument, logActivity } from "@/lib/data";
 
+export const dynamic = "force-dynamic";
+
 export async function DELETE(
   _request: Request,
   { params }: { params: { id: string; documentId: string } }

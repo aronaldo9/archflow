@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { updateMilestone, deleteMilestone, logActivity } from "@/lib/data";
 
+export const dynamic = "force-dynamic";
+
 export async function PUT(
   request: Request,
   { params }: { params: { id: string; milestoneId: string } }

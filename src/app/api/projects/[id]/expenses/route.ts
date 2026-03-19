@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { createExpense, logActivity } from "@/lib/data";
 import { formatCurrency } from "@/lib/utils";
 
+export const dynamic = "force-dynamic";
+
 export async function POST(
   request: Request,
   { params }: { params: { id: string } }
