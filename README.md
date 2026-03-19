@@ -1,36 +1,53 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ArchFlow
 
-## Getting Started
+Herramienta de gestión de proyectos para estudios de arquitectura. Permite hacer seguimiento de proyectos, presupuestos, hitos, equipo, documentación y actividad — con un portal de acceso para clientes.
 
-First, run the development server:
+**Producción:** [archflow-kks5.vercel.app](https://archflow-kks5.vercel.app)
+
+## Stack
+
+- **Next.js 14** (App Router)
+- **TypeScript**
+- **Tailwind CSS**
+- **Prisma v5** + **PostgreSQL** (Neon)
+- **Recharts** — gráficos de presupuesto
+- **Leaflet** — mapa de proyectos
+- **JWT** (`jose`) + **bcryptjs** — autenticación
+
+## Funcionalidades
+
+- Dashboard con estadísticas y gráficos
+- Gestión completa de proyectos (presupuesto, hitos, gastos, equipo, documentos, galería)
+- Calendario de hitos
+- Mapa interactivo de proyectos en Granada
+- Informes PDF por proyecto
+- Portal de cliente con vista de su proyecto
+- Roles: `admin`, `client`, `normal`
+
+## Arrancar en local
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Crea un archivo `.env` con:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+DATABASE_URL="postgresql://..."
+JWT_SECRET="tu-secreto"
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npx prisma migrate dev --name init
+npx prisma db seed
+npm run dev
+```
 
-## Learn More
+Abre [http://localhost:3000](http://localhost:3000).
 
-To learn more about Next.js, take a look at the following resources:
+## Usuarios de prueba
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| Email | Contraseña | Rol |
+|-------|-----------|-----|
+| admin@archflow.es | Admin1234! | Admin |
+| jmorales@gmail.com | Cliente1234! | Cliente |
