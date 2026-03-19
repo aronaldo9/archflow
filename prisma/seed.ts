@@ -556,8 +556,8 @@ async function main() {
 
   for (const img of imgs) {
     await prisma.$executeRaw`
-      INSERT INTO "Document" (id, name, fileUrl, uploadedAt, projectId)
-      VALUES (${img.id}, ${img.name}, ${img.fileUrl}, ${img.uploadedAt}, ${img.projectId})
+      INSERT INTO "Document" (id, name, "fileUrl", "uploadedAt", "projectId")
+      VALUES (${img.id}, ${img.name}, ${img.fileUrl}, ${new Date(img.uploadedAt)}, ${img.projectId})
     `;
   }
 
@@ -603,8 +603,8 @@ async function main() {
 
   for (const u of users) {
     await prisma.$executeRaw`
-      INSERT INTO "User" (id, email, password, name, role, projectId, createdAt, updatedAt)
-      VALUES (${u.id}, ${u.email}, ${u.password}, ${u.name}, ${u.role}, ${u.projectId}, datetime('now'), datetime('now'))
+      INSERT INTO "User" (id, email, password, name, role, "projectId", "createdAt", "updatedAt")
+      VALUES (${u.id}, ${u.email}, ${u.password}, ${u.name}, ${u.role}, ${u.projectId}, ${new Date()}, ${new Date()})
     `;
   }
 
