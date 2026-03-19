@@ -171,7 +171,9 @@ export default function LandingPage() {
       {/* ── Navbar ── */}
       <header className="sticky top-0 z-50 border-b border-zinc-800/60 bg-zinc-950/80 backdrop-blur-md">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Logo size="sm" />
+          <Link href="/">
+            <Logo size="sm" />
+          </Link>
           <Link
             href="/login"
             className="text-zinc-500 hover:text-zinc-300 text-sm transition-colors"
@@ -426,6 +428,11 @@ export default function LandingPage() {
             >
               Solicitar presupuesto gratuito
             </a>
+            <div className="mt-6 relative">
+              <a href="#" className="text-zinc-500 hover:text-zinc-300 text-sm transition-colors">
+                ← Volver al inicio
+              </a>
+            </div>
           </div>
         </div>
       </section>
