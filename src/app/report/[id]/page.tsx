@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { getProjectById, getDocumentsByProject, getExpensesByProject, getActivityByProject, getTeamByProject } from "@/lib/data";
-import { formatCurrency, formatDate, getPhaseLabel, statusConfig } from "@/lib/utils";
+import { formatDate, getPhaseLabel, statusConfig } from "@/lib/utils";
 import ReportActions from "@/components/ReportActions";
 
 function fmt(n: number) {

@@ -22,6 +22,7 @@ const STATUS_DOT: Record<string, string> = {
   on_hold:     "bg-zinc-500",
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const STATUS_TEXT: Record<string, string> = {
   planning:    "text-blue-400",
   in_progress: "text-amber-400",
