@@ -6,6 +6,8 @@ import ProgressBar from "@/components/ProgressBar";
 import StatsCard from "@/components/StatsCard";
 import BudgetChart from "@/components/BudgetChart";
 
+export const dynamic = "force-dynamic";
+
 export default async function DashboardPage() {
   const [stats, allProjects, budgetAnalytics] = await Promise.all([
     getProjectStats(),

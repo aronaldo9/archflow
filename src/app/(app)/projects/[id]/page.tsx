@@ -19,6 +19,8 @@ import ExpenseManager from "@/components/ExpenseManager";
 import ActivityFeed from "@/components/ActivityFeed";
 import TeamSection from "@/components/TeamSection";
 
+export const dynamic = "force-dynamic";
+
 export default async function ProjectDetailPage({ params }: { params: { id: string } }) {
   const [project, rawDocuments, expenses, activity, team] = await Promise.all([
     getProjectById(params.id),

@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+export const dynamic = "force-dynamic";
+
 // ── Logo (shared SVG) ─────────────────────────────────────────────────────────
 function Logo({ size = "md" }: { size?: "sm" | "md" | "lg" }) {
   const dims = { sm: [160, 40], md: [192, 48], lg: [240, 60] }[size];

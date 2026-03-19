@@ -1,6 +1,8 @@
 import { getAllMilestonesForCalendar } from "@/lib/data";
 import CalendarView from "@/components/CalendarView";
 
+export const dynamic = "force-dynamic";
+
 export default async function CalendarPage() {
   const events = await getAllMilestonesForCalendar();
 

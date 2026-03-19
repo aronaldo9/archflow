@@ -6,6 +6,8 @@ import StatusBadge from "@/components/StatusBadge";
 import ProgressBar from "@/components/ProgressBar";
 import ProjectFilters from "@/components/ProjectFilters";
 
+export const dynamic = "force-dynamic";
+
 export default async function ProjectsPage({
   searchParams,
 }: {

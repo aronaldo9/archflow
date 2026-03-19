@@ -3,6 +3,8 @@ import { getProjectById, getDocumentsByProject, getExpensesByProject, getActivit
 import { formatDate, getPhaseLabel, statusConfig } from "@/lib/utils";
 import ReportActions from "@/components/ReportActions";
 
+export const dynamic = "force-dynamic";
+
 function fmt(n: number) {
   return new Intl.NumberFormat("es-ES", { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(n);
 }

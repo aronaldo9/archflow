@@ -1,6 +1,8 @@
 import dynamic from "next/dynamic";
 import { getProjectsForMap } from "@/lib/data";
 
+export const dynamic = "force-dynamic";
+
 const ProjectMap = dynamic(() => import("@/components/ProjectMap"), {
   ssr: false,
   loading: () => (

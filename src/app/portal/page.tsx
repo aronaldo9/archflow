@@ -5,6 +5,8 @@ import { redirect } from "next/navigation";
 import LogoutButton from "@/components/LogoutButton";
 import PortalGallery from "@/components/PortalGallery";
 
+export const dynamic = "force-dynamic";
+
 // ── Logo (inline, sin importar el componente del app layout) ──────────────────
 function Logo() {
   return (
