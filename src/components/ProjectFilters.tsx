@@ -47,6 +47,7 @@ export default function ProjectFilters({ counts, typeCounts }: Props) {
       {/* Search */}
       <div className="relative">
         <svg
+          aria-hidden="true"
           className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500"
           fill="none"
           stroke="currentColor"
@@ -61,6 +62,7 @@ export default function ProjectFilters({ counts, typeCounts }: Props) {
         </svg>
         <input
           type="search"
+          aria-label="Buscar proyectos"
           placeholder="Buscar por nombre, código o cliente..."
           defaultValue={q}
           onChange={(e) => update("q", e.target.value)}
@@ -69,11 +71,12 @@ export default function ProjectFilters({ counts, typeCounts }: Props) {
       </div>
 
       {/* Status pills */}
-      <div className="flex flex-wrap gap-2">
+      <div role="group" aria-label="Filtrar por estado" className="flex flex-wrap gap-2">
         {FILTERS.map((f) => (
           <button
             key={f.key}
             onClick={() => update("status", f.key)}
+            aria-pressed={status === f.key}
             className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
               status === f.key
                 ? "bg-zinc-700 text-white"
@@ -87,11 +90,12 @@ export default function ProjectFilters({ counts, typeCounts }: Props) {
       </div>
 
       {/* Type pills */}
-      <div className="flex flex-wrap gap-2">
+      <div role="group" aria-label="Filtrar por tipo" className="flex flex-wrap gap-2">
         {TYPE_FILTERS.map((f) => (
           <button
             key={f.key}
             onClick={() => update("type", f.key)}
+            aria-pressed={type === f.key}
             className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
               type === f.key
                 ? "bg-zinc-700 text-white"

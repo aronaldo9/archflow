@@ -43,8 +43,8 @@ export default function LoginPage() {
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="flex justify-center mb-8">
-          <Link href="/">
-          <svg width="192" height="48" viewBox="0 0 192 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <Link href="/" aria-label="ArchFlow — ir al inicio">
+          <svg width="192" height="48" viewBox="0 0 192 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
             <defs>
               <linearGradient id="lg-gold" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor="#fbbf24" />
@@ -72,13 +72,14 @@ export default function LoginPage() {
 
         {/* Card */}
         <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-8">
-          <h2 className="text-white font-semibold text-xl mb-1">Iniciar sesión</h2>
+          <h1 className="text-white font-semibold text-xl mb-1">Iniciar sesión</h1>
           <p className="text-zinc-500 text-sm mb-6">Accede a tu cuenta de ArchFlow</p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-zinc-400 text-sm mb-1.5">Email</label>
+              <label htmlFor="login-email" className="block text-zinc-400 text-sm mb-1.5">Email</label>
               <input
+                id="login-email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -90,8 +91,9 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <label className="block text-zinc-400 text-sm mb-1.5">Contraseña</label>
+              <label htmlFor="login-password" className="block text-zinc-400 text-sm mb-1.5">Contraseña</label>
               <input
+                id="login-password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -103,7 +105,7 @@ export default function LoginPage() {
             </div>
 
             {error && (
-              <p className="text-red-400 text-sm bg-red-950/40 border border-red-900/50 rounded-lg px-3 py-2">
+              <p role="alert" className="text-red-400 text-sm bg-red-950/40 border border-red-900/50 rounded-lg px-3 py-2">
                 {error}
               </p>
             )}
@@ -118,15 +120,16 @@ export default function LoginPage() {
           </form>
         </div>
 
-        <p className="text-center mt-5">
-          <Link href="/" className="text-zinc-500 hover:text-zinc-300 text-sm transition-colors">
-            ← Volver al inicio
-          </Link>
-        </p>
-
-        <p className="text-center text-zinc-600 text-xs mt-4">
-          © {new Date().getFullYear()} ArchFlow · Todos los derechos reservados
-        </p>
+        <footer className="mt-5 text-center space-y-3">
+          <p>
+            <Link href="/" className="text-zinc-500 hover:text-zinc-300 text-sm transition-colors">
+              ← Volver al inicio
+            </Link>
+          </p>
+          <p className="text-zinc-600 text-xs">
+            © {new Date().getFullYear()} ArchFlow · Todos los derechos reservados
+          </p>
+        </footer>
       </div>
     </div>
   );

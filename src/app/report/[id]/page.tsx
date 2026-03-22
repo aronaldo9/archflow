@@ -38,11 +38,11 @@ export default async function ReportPage({ params }: { params: { id: string } })
       <ReportActions />
 
       {/* ── Report body ── */}
-      <div className="min-h-screen bg-white text-zinc-900 font-sans">
+      <article className="min-h-screen bg-white text-zinc-900 font-sans">
         <div className="max-w-4xl mx-auto px-10 py-12 print:px-8 print:py-8">
 
           {/* Cover */}
-          <div className="flex items-start justify-between mb-10 pb-8 border-b-2 border-zinc-900">
+          <header className="flex items-start justify-between mb-10 pb-8 border-b-2 border-zinc-900">
             <div>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/logo.png" alt="ArchFlow" width={200} height={60} className="mb-4 object-contain" />
@@ -60,7 +60,7 @@ export default async function ReportPage({ params }: { params: { id: string } })
               <p className="text-xs text-zinc-400">Generado el</p>
               <p className="text-sm font-medium text-zinc-700">{generatedAt}</p>
             </div>
-          </div>
+          </header>
 
           {/* Summary */}
           <section className="mb-10">
@@ -95,7 +95,7 @@ export default async function ReportPage({ params }: { params: { id: string } })
               <thead className="bg-zinc-50">
                 <tr>
                   {["Presupuesto total","Gasto declarado","Gastos registrados","Restante","Utilización"].map((h) => (
-                    <th key={h} className="text-left px-4 py-2.5 text-xs font-semibold text-zinc-500 uppercase tracking-wide border-b border-zinc-200">{h}</th>
+                    <th key={h} scope="col" className="text-left px-4 py-2.5 text-xs font-semibold text-zinc-500 uppercase tracking-wide border-b border-zinc-200">{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -125,7 +125,7 @@ export default async function ReportPage({ params }: { params: { id: string } })
               <table className="w-full text-sm border border-zinc-200 rounded-lg overflow-hidden">
                 <thead className="bg-zinc-50"><tr>
                   {["Nombre","Rol","Contacto"].map((h) => (
-                    <th key={h} className="text-left px-4 py-2.5 text-xs font-semibold text-zinc-500 uppercase tracking-wide border-b border-zinc-200">{h}</th>
+                    <th key={h} scope="col" className="text-left px-4 py-2.5 text-xs font-semibold text-zinc-500 uppercase tracking-wide border-b border-zinc-200">{h}</th>
                   ))}
                 </tr></thead>
                 <tbody>
@@ -148,7 +148,7 @@ export default async function ReportPage({ params }: { params: { id: string } })
               <table className="w-full text-sm border border-zinc-200 rounded-lg overflow-hidden">
                 <thead className="bg-zinc-50"><tr>
                   {["Hito","Fecha límite","Estado"].map((h) => (
-                    <th key={h} className="text-left px-4 py-2.5 text-xs font-semibold text-zinc-500 uppercase tracking-wide border-b border-zinc-200">{h}</th>
+                    <th key={h} scope="col" className="text-left px-4 py-2.5 text-xs font-semibold text-zinc-500 uppercase tracking-wide border-b border-zinc-200">{h}</th>
                   ))}
                 </tr></thead>
                 <tbody>
@@ -175,7 +175,7 @@ export default async function ReportPage({ params }: { params: { id: string } })
               <table className="w-full text-sm border border-zinc-200 rounded-lg overflow-hidden">
                 <thead className="bg-zinc-50"><tr>
                   {["Descripción","Categoría","Fecha","Importe"].map((h) => (
-                    <th key={h} className="text-left px-4 py-2.5 text-xs font-semibold text-zinc-500 uppercase tracking-wide border-b border-zinc-200">{h}</th>
+                    <th key={h} scope="col" className="text-left px-4 py-2.5 text-xs font-semibold text-zinc-500 uppercase tracking-wide border-b border-zinc-200">{h}</th>
                   ))}
                 </tr></thead>
                 <tbody>
@@ -203,7 +203,7 @@ export default async function ReportPage({ params }: { params: { id: string } })
               <ul className="space-y-1">
                 {files.map((d) => (
                   <li key={d.id} className="flex items-center gap-2 text-sm text-zinc-600 py-1 border-b border-zinc-100">
-                    <svg className="w-4 h-4 text-zinc-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg aria-hidden="true" className="w-4 h-4 text-zinc-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
                     <span className="flex-1">{d.name}</span>
@@ -236,7 +236,7 @@ export default async function ReportPage({ params }: { params: { id: string } })
             <span>{project.code} · {generatedAt}</span>
           </footer>
         </div>
-      </div>
+      </article>
     </>
   );
 }

@@ -92,49 +92,55 @@ export default async function PortalPage() {
       <main className="max-w-4xl mx-auto px-6 py-10 space-y-10">
 
         {/* ── Intro ── */}
-        <div>
+        <header>
           <p className="text-zinc-500 text-sm mb-1">Portal del cliente</p>
           <h1 className="text-2xl font-bold text-white">{project.name}</h1>
           <p className="text-zinc-500 text-sm mt-1">{project.location} · Ref. {project.code}</p>
-        </div>
+        </header>
 
         {/* ── Estado general ── */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          {/* Estado */}
-          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4">
-            <p className="text-zinc-500 text-xs mb-2">Estado</p>
-            <span className={`inline-flex items-center gap-1.5 text-sm font-medium ${st.color}`}>
-              <span className={`w-2 h-2 rounded-full ${st.dot}`} />
-              {st.label}
-            </span>
-          </div>
+        <ul className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <li className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4">
+            <dl>
+              <dt className="text-zinc-500 text-xs mb-2">Estado</dt>
+              <dd>
+                <span className={`inline-flex items-center gap-1.5 text-sm font-medium ${st.color}`}>
+                  <span aria-hidden="true" className={`w-2 h-2 rounded-full ${st.dot}`} />
+                  {st.label}
+                </span>
+              </dd>
+            </dl>
+          </li>
 
-          {/* Fase */}
-          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4">
-            <p className="text-zinc-500 text-xs mb-2">Fase actual</p>
-            <p className="text-white text-sm font-medium leading-tight">{getPhaseLabel(project.phase)}</p>
-          </div>
+          <li className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4">
+            <dl>
+              <dt className="text-zinc-500 text-xs mb-2">Fase actual</dt>
+              <dd className="text-white text-sm font-medium leading-tight">{getPhaseLabel(project.phase)}</dd>
+            </dl>
+          </li>
 
-          {/* Fechas */}
-          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4">
-            <p className="text-zinc-500 text-xs mb-2">Fecha de entrega</p>
-            <p className="text-white text-sm font-medium">{formatDate(project.endDate)}</p>
-          </div>
+          <li className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4">
+            <dl>
+              <dt className="text-zinc-500 text-xs mb-2">Fecha de entrega</dt>
+              <dd className="text-white text-sm font-medium">{formatDate(project.endDate)}</dd>
+            </dl>
+          </li>
 
-          {/* Presupuesto */}
-          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4">
-            <p className="text-zinc-500 text-xs mb-2">Presupuesto</p>
-            <p className="text-white text-sm font-medium">{formatCurrency(project.budget)}</p>
-          </div>
-        </div>
+          <li className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4">
+            <dl>
+              <dt className="text-zinc-500 text-xs mb-2">Presupuesto</dt>
+              <dd className="text-white text-sm font-medium">{formatCurrency(project.budget)}</dd>
+            </dl>
+          </li>
+        </ul>
 
         {/* ── Progreso ── */}
-        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6">
+        <section aria-labelledby="portal-progress-title" className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="font-semibold text-white">Avance del proyecto</h2>
-            <span className="text-2xl font-bold text-amber-400">{project.progress}%</span>
+            <h2 id="portal-progress-title" className="font-semibold text-white">Avance del proyecto</h2>
+            <span className="text-2xl font-bold text-amber-400" aria-label={`${project.progress} por ciento`}>{project.progress}%</span>
           </div>
-          <div className="w-full bg-zinc-800 rounded-full h-3 overflow-hidden">
+          <div role="progressbar" aria-valuenow={project.progress} aria-valuemin={0} aria-valuemax={100} aria-label="Progreso del proyecto" className="w-full bg-zinc-800 rounded-full h-3 overflow-hidden">
             <div
               className="h-3 rounded-full bg-gradient-to-r from-amber-500 to-amber-400 transition-all"
               style={{ width: `${project.progress}%` }}
@@ -145,45 +151,45 @@ export default async function PortalPage() {
               {completedMilestones} de {totalMilestones} hitos completados
             </p>
           )}
-        </div>
+        </section>
 
         {/* ── Descripción ── */}
         {project.description && (
-          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6">
-            <h2 className="font-semibold text-white mb-3">Descripción del proyecto</h2>
+          <section aria-labelledby="portal-desc-title" className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6">
+            <h2 id="portal-desc-title" className="font-semibold text-white mb-3">Descripción del proyecto</h2>
             <p className="text-zinc-400 text-sm leading-relaxed">{project.description}</p>
-          </div>
+          </section>
         )}
 
         {/* ── Hitos ── */}
         {project.milestones.length > 0 && (
-          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6">
-            <h2 className="font-semibold text-white mb-5">Hitos</h2>
-            <div className="space-y-3">
+          <section aria-labelledby="portal-milestones-title" className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6">
+            <h2 id="portal-milestones-title" className="font-semibold text-white mb-5">Hitos</h2>
+            <ul className="space-y-3">
               {project.milestones.map((m) => (
-                <div key={m.id} className="flex items-start gap-3">
-                  {/* Icono */}
-                  <div className={`mt-0.5 w-5 h-5 rounded-full flex-shrink-0 flex items-center justify-center border ${
-                    m.completed
-                      ? "bg-emerald-500/20 border-emerald-500/40"
-                      : "bg-zinc-800 border-zinc-700"
-                  }`}>
+                <li key={m.id} className="flex items-start gap-3">
+                  <div
+                    aria-hidden="true"
+                    className={`mt-0.5 w-5 h-5 rounded-full flex-shrink-0 flex items-center justify-center border ${
+                      m.completed
+                        ? "bg-emerald-500/20 border-emerald-500/40"
+                        : "bg-zinc-800 border-zinc-700"
+                    }`}
+                  >
                     {m.completed ? (
-                      <svg className="w-3 h-3 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg aria-hidden="true" className="w-3 h-3 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                       </svg>
                     ) : (
                       <span className="w-1.5 h-1.5 rounded-full bg-zinc-600" />
                     )}
                   </div>
-                  {/* Texto */}
                   <div className="flex-1 min-w-0">
                     <p className={`text-sm font-medium ${m.completed ? "text-zinc-300" : "text-white"}`}>
                       {m.title}
                     </p>
                     <p className="text-zinc-600 text-xs mt-0.5">{formatDate(m.dueDate)}</p>
                   </div>
-                  {/* Badge */}
                   <span className={`text-xs px-2 py-0.5 rounded-full flex-shrink-0 ${
                     m.completed
                       ? "bg-emerald-500/10 text-emerald-400"
@@ -191,10 +197,10 @@ export default async function PortalPage() {
                   }`}>
                     {m.completed ? "Completado" : "Pendiente"}
                   </span>
-                </div>
+                </li>
               ))}
-            </div>
-          </div>
+            </ul>
+          </section>
         )}
 
         {/* ── Galería ── */}
@@ -202,37 +208,38 @@ export default async function PortalPage() {
 
         {/* ── Documentos ── */}
         {docs.length > 0 && (
-          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6">
-            <h2 className="font-semibold text-white mb-4">Documentación</h2>
-            <div className="space-y-2">
+          <section aria-labelledby="portal-docs-title" className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6">
+            <h2 id="portal-docs-title" className="font-semibold text-white mb-4">Documentación</h2>
+            <ul className="space-y-2">
               {docs.map((doc) => (
-                <a
-                  key={doc.id}
-                  href={doc.fileUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-3 p-3 rounded-xl hover:bg-zinc-800 transition-colors group"
-                >
-                  <div className="w-9 h-9 bg-zinc-800 group-hover:bg-zinc-700 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors">
-                    <svg className="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                <li key={doc.id}>
+                  <a
+                    href={doc.fileUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 p-3 rounded-xl hover:bg-zinc-800 transition-colors group"
+                  >
+                    <div aria-hidden="true" className="w-9 h-9 bg-zinc-800 group-hover:bg-zinc-700 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors">
+                      <svg aria-hidden="true" className="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-white truncate">{doc.name}</p>
+                      <p className="text-xs text-zinc-600">{formatDate(doc.uploadedAt)}</p>
+                    </div>
+                    <svg aria-hidden="true" className="w-4 h-4 text-zinc-600 group-hover:text-zinc-400 transition-colors flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                     </svg>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm text-white truncate">{doc.name}</p>
-                    <p className="text-xs text-zinc-600">{formatDate(doc.uploadedAt)}</p>
-                  </div>
-                  <svg className="w-4 h-4 text-zinc-600 group-hover:text-zinc-400 transition-colors flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                  </svg>
-                </a>
+                  </a>
+                </li>
               ))}
-            </div>
-          </div>
+            </ul>
+          </section>
         )}
 
         {/* ── Contacto ── */}
-        <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6 text-center">
+        <aside className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6 text-center">
           <p className="text-zinc-500 text-sm">¿Tienes alguna pregunta sobre tu proyecto?</p>
           <a
             href="mailto:hola@archflow.es"
@@ -240,7 +247,7 @@ export default async function PortalPage() {
           >
             hola@archflow.es
           </a>
-        </div>
+        </aside>
 
       </main>
     </div>

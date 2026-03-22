@@ -45,7 +45,7 @@ export default async function MapPage() {
       </div>
 
       {/* Mapa */}
-      <div className="h-[560px] rounded-xl overflow-hidden border border-zinc-700/50">
+      <div className="h-[280px] sm:h-[400px] lg:h-[560px] rounded-xl overflow-hidden border border-zinc-700/50">
         <ProjectMap projects={projects} />
       </div>
 

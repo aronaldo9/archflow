@@ -96,7 +96,7 @@ export default function TeamSection({ projectId, members }: Props) {
           onClick={() => setAdding(true)}
           className="inline-flex items-center gap-1.5 text-xs bg-zinc-700 hover:bg-zinc-600 text-white px-2.5 py-1.5 rounded-lg transition-colors"
         >
-          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg aria-hidden="true" className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
           </svg>
           Añadir
@@ -115,12 +115,12 @@ export default function TeamSection({ projectId, members }: Props) {
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-white truncate">{m.name}</p>
-              <p className="text-xs text-zinc-500 truncate">{m.role}</p>
+              <p className="text-xs text-zinc-400 truncate">{m.role}</p>
             </div>
             <div className="flex items-center gap-1 flex-shrink-0">
               {m.email && (
-                <a href={`mailto:${m.email}`} className="text-zinc-500 hover:text-white p-1 rounded transition-colors" title={m.email}>
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <a href={`mailto:${m.email}`} className="text-zinc-400 hover:text-white p-1 rounded transition-colors" aria-label={`Enviar email a ${m.name}`}>
+                  <svg aria-hidden="true" className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
                 </a>
@@ -128,9 +128,10 @@ export default function TeamSection({ projectId, members }: Props) {
               <button
                 onClick={() => handleDelete(m.id)}
                 disabled={deletingId === m.id}
-                className="text-zinc-600 hover:text-red-400 p-1 rounded transition-colors opacity-0 group-hover:opacity-100 disabled:opacity-30"
+                aria-label={`Eliminar miembro ${m.name}`}
+                className="text-zinc-500 hover:text-red-400 p-1 rounded transition-colors opacity-0 group-hover:opacity-100 disabled:opacity-30"
               >
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg aria-hidden="true" className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
@@ -142,13 +143,17 @@ export default function TeamSection({ projectId, members }: Props) {
       {adding && (
         <div className="mt-3 p-3 bg-zinc-800/60 rounded-lg border border-zinc-700/50 space-y-2">
           <p className="text-xs text-zinc-400 uppercase tracking-wide">Nuevo Miembro</p>
-          <input placeholder="Nombre *" value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} className={`w-full ${inputCls}`} />
-          <select value={form.role} onChange={(e) => setForm((f) => ({ ...f, role: e.target.value }))} className={`w-full ${inputCls}`}>
+          <label htmlFor="member-name" className="sr-only">Nombre</label>
+          <input id="member-name" placeholder="Nombre *" value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} className={`w-full ${inputCls}`} />
+          <label htmlFor="member-role" className="sr-only">Rol</label>
+          <select id="member-role" value={form.role} onChange={(e) => setForm((f) => ({ ...f, role: e.target.value }))} className={`w-full ${inputCls}`}>
             {ROLES.map((r) => <option key={r} value={r}>{r}</option>)}
           </select>
           <div className="grid grid-cols-2 gap-2">
-            <input placeholder="Email" value={form.email} onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))} className={inputCls} />
-            <input placeholder="Teléfono" value={form.phone} onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))} className={inputCls} />
+            <label htmlFor="member-email" className="sr-only">Email</label>
+            <input id="member-email" placeholder="Email" value={form.email} onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))} className={inputCls} />
+            <label htmlFor="member-phone" className="sr-only">Teléfono</label>
+            <input id="member-phone" placeholder="Teléfono" value={form.phone} onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))} className={inputCls} />
           </div>
           <div className="flex gap-2 pt-1">
             <button onClick={handleAdd} disabled={loading || !form.name.trim()} className="text-sm bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-black font-medium px-3 py-1.5 rounded-lg transition-colors">

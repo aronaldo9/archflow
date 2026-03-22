@@ -88,7 +88,7 @@ export default function ExpenseManager({ projectId, expenses }: Props) {
           onClick={() => setAdding(true)}
           className="inline-flex items-center gap-1.5 text-xs bg-zinc-700 hover:bg-zinc-600 text-white px-2.5 py-1.5 rounded-lg transition-colors"
         >
-          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg aria-hidden="true" className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
           </svg>
           Añadir Gasto
@@ -108,14 +108,15 @@ export default function ExpenseManager({ projectId, expenses }: Props) {
                 {CATEGORIES[e.category] ?? e.category}
               </span>
               <p className="flex-1 text-sm text-white truncate min-w-0">{e.description}</p>
-              <span className="text-xs text-zinc-500 flex-shrink-0">{fmtDate(e.date)}</span>
+              <span className="text-xs text-zinc-400 flex-shrink-0">{fmtDate(e.date)}</span>
               <span className="text-sm font-semibold text-white tabular-nums flex-shrink-0">{fmt(e.amount)}</span>
               <button
                 onClick={() => handleDelete(e.id)}
                 disabled={deletingId === e.id}
-                className="text-zinc-600 hover:text-red-400 p-1 rounded transition-colors opacity-0 group-hover:opacity-100 flex-shrink-0 disabled:opacity-30"
+                aria-label={`Eliminar gasto: ${e.description}`}
+                className="text-zinc-500 hover:text-red-400 p-1 rounded transition-colors opacity-0 group-hover:opacity-100 flex-shrink-0 disabled:opacity-30"
               >
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg aria-hidden="true" className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                 </svg>
               </button>
@@ -125,7 +126,7 @@ export default function ExpenseManager({ projectId, expenses }: Props) {
           {/* Total */}
           {expenses.length > 0 && (
             <div className="flex items-center justify-between pt-3 mt-1 border-t border-zinc-700/50">
-              <span className="text-zinc-400 text-sm font-medium">Total registrado</span>
+              <span className="text-zinc-300 text-sm font-medium">Total registrado</span>
               <span className="text-white font-semibold text-base tabular-nums">{fmt(total)}</span>
             </div>
           )}
@@ -136,13 +137,17 @@ export default function ExpenseManager({ projectId, expenses }: Props) {
         <div className="mt-4 p-3 bg-zinc-800/60 rounded-lg border border-zinc-700/50 space-y-3">
           <p className="text-xs text-zinc-400 uppercase tracking-wide">Nuevo Gasto</p>
           <div className="grid grid-cols-2 gap-2">
+            <label htmlFor="expense-description" className="sr-only">Descripción</label>
             <input
+              id="expense-description"
               placeholder="Descripción *"
               value={form.description}
               onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
               className={`col-span-2 ${inputCls}`}
             />
+            <label htmlFor="expense-amount" className="sr-only">Importe en euros</label>
             <input
+              id="expense-amount"
               type="number"
               placeholder="Importe (€) *"
               value={form.amount}
@@ -150,13 +155,17 @@ export default function ExpenseManager({ projectId, expenses }: Props) {
               min={0}
               className={inputCls}
             />
+            <label htmlFor="expense-date" className="sr-only">Fecha</label>
             <input
+              id="expense-date"
               type="date"
               value={form.date}
               onChange={(e) => setForm((f) => ({ ...f, date: e.target.value }))}
               className={inputCls}
             />
+            <label htmlFor="expense-category" className="sr-only">Categoría</label>
             <select
+              id="expense-category"
               value={form.category}
               onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))}
               className={`col-span-2 ${inputCls}`}

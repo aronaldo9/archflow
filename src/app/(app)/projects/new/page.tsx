@@ -73,7 +73,7 @@ export default function NewProjectPage() {
         href="/projects"
         className="inline-flex items-center gap-1.5 text-zinc-400 hover:text-white text-sm mb-6 transition-colors"
       >
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg aria-hidden="true" className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
         </svg>
         Volver a Proyectos
@@ -82,9 +82,10 @@ export default function NewProjectPage() {
       <form onSubmit={handleSubmit} className="space-y-8">
         {/* Identificación del proyecto */}
         <Section title="Identificación del Proyecto" description="Información básica para identificar este proyecto.">
-          <div className="grid grid-cols-2 gap-4">
-            <Field label="Nombre del Proyecto" required className="col-span-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Field label="Nombre del Proyecto" htmlFor="new-name" required className="sm:col-span-2">
               <input
+                id="new-name"
                 name="name"
                 value={form.name}
                 onChange={handleChange}
@@ -93,8 +94,9 @@ export default function NewProjectPage() {
                 className={inputCls}
               />
             </Field>
-            <Field label="Código de Proyecto" required>
+            <Field label="Código de Proyecto" htmlFor="new-code" required>
               <input
+                id="new-code"
                 name="code"
                 value={form.code}
                 onChange={handleChange}
@@ -103,8 +105,9 @@ export default function NewProjectPage() {
                 className={inputCls}
               />
             </Field>
-            <Field label="Ubicación" required>
+            <Field label="Ubicación" htmlFor="new-location" required>
               <input
+                id="new-location"
                 name="location"
                 value={form.location}
                 onChange={handleChange}
@@ -113,8 +116,9 @@ export default function NewProjectPage() {
                 className={inputCls}
               />
             </Field>
-            <Field label="Descripción" className="col-span-2">
+            <Field label="Descripción" htmlFor="new-description" className="sm:col-span-2">
               <textarea
+                id="new-description"
                 name="description"
                 value={form.description}
                 onChange={handleChange}
@@ -123,8 +127,9 @@ export default function NewProjectPage() {
                 className={`${inputCls} resize-none`}
               />
             </Field>
-            <Field label="Etiquetas">
+            <Field label="Etiquetas" htmlFor="new-tags">
               <input
+                id="new-tags"
                 name="tags"
                 value={form.tags}
                 onChange={handleChange}
@@ -137,9 +142,10 @@ export default function NewProjectPage() {
 
         {/* Estado y Fase */}
         <Section title="Estado y Fase" description="Tipo, estado actual y fase de diseño del proyecto.">
-          <div className="grid grid-cols-2 gap-4">
-            <Field label="Tipo de Proyecto" className="col-span-2">
-              <div className="flex gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <fieldset className="sm:col-span-2">
+              <legend className="block text-zinc-300 text-sm font-medium mb-1.5">Tipo de Proyecto</legend>
+              <div className="flex flex-col sm:flex-row gap-3">
                 {[
                   { value: "administrative", label: "Administrativo", desc: "Institucional, público o comercial" },
                   { value: "personal", label: "Personal", desc: "Encargo privado o residencial" },
@@ -167,16 +173,16 @@ export default function NewProjectPage() {
                   </label>
                 ))}
               </div>
-            </Field>
-            <Field label="Estado">
-              <select name="status" value={form.status} onChange={handleChange} className={selectCls}>
+            </fieldset>
+            <Field label="Estado" htmlFor="new-status">
+              <select id="new-status" name="status" value={form.status} onChange={handleChange} className={selectCls}>
                 {statuses.map((s) => (
                   <option key={s.value} value={s.value}>{s.label}</option>
                 ))}
               </select>
             </Field>
-            <Field label="Fase">
-              <select name="phase" value={form.phase} onChange={handleChange} className={selectCls}>
+            <Field label="Fase" htmlFor="new-phase">
+              <select id="new-phase" name="phase" value={form.phase} onChange={handleChange} className={selectCls}>
                 {phases.map((p) => (
                   <option key={p.value} value={p.value}>{p.label}</option>
                 ))}
@@ -187,9 +193,10 @@ export default function NewProjectPage() {
 
         {/* Calendario y Presupuesto */}
         <Section title="Calendario y Presupuesto" description="Cronograma del proyecto y asignación económica.">
-          <div className="grid grid-cols-2 gap-4">
-            <Field label="Fecha de Inicio" required>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Field label="Fecha de Inicio" htmlFor="new-startDate" required>
               <input
+                id="new-startDate"
                 type="date"
                 name="startDate"
                 value={form.startDate}
@@ -198,8 +205,9 @@ export default function NewProjectPage() {
                 className={inputCls}
               />
             </Field>
-            <Field label="Fecha de Fin" required>
+            <Field label="Fecha de Fin" htmlFor="new-endDate" required>
               <input
+                id="new-endDate"
                 type="date"
                 name="endDate"
                 value={form.endDate}
@@ -208,10 +216,11 @@ export default function NewProjectPage() {
                 className={inputCls}
               />
             </Field>
-            <Field label="Presupuesto (EUR)" required className="col-span-2">
+            <Field label="Presupuesto (EUR)" htmlFor="new-budget" required className="sm:col-span-2">
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 text-sm">€</span>
+                <span aria-hidden="true" className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 text-sm">€</span>
                 <input
+                  id="new-budget"
                   type="number"
                   name="budget"
                   value={form.budget}
@@ -228,9 +237,10 @@ export default function NewProjectPage() {
 
         {/* Información del Cliente */}
         <Section title="Información del Cliente" description="Contacto principal de este proyecto.">
-          <div className="grid grid-cols-2 gap-4">
-            <Field label="Nombre del Cliente" required className="col-span-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Field label="Nombre del Cliente" htmlFor="new-clientName" required className="sm:col-span-2">
               <input
+                id="new-clientName"
                 name="clientName"
                 value={form.clientName}
                 onChange={handleChange}
@@ -239,8 +249,9 @@ export default function NewProjectPage() {
                 className={inputCls}
               />
             </Field>
-            <Field label="Correo Electrónico">
+            <Field label="Correo Electrónico" htmlFor="new-clientEmail">
               <input
+                id="new-clientEmail"
                 type="email"
                 name="clientEmail"
                 value={form.clientEmail}
@@ -249,8 +260,9 @@ export default function NewProjectPage() {
                 className={inputCls}
               />
             </Field>
-            <Field label="Teléfono">
+            <Field label="Teléfono" htmlFor="new-clientPhone">
               <input
+                id="new-clientPhone"
                 type="tel"
                 name="clientPhone"
                 value={form.clientPhone}
@@ -318,20 +330,22 @@ function Section({
 
 function Field({
   label,
+  htmlFor,
   required,
   className = "",
   children,
 }: {
   label: string;
+  htmlFor?: string;
   required?: boolean;
   className?: string;
   children: React.ReactNode;
 }) {
   return (
     <div className={className}>
-      <label className="block text-zinc-300 text-sm font-medium mb-1.5">
+      <label htmlFor={htmlFor} className="block text-zinc-300 text-sm font-medium mb-1.5">
         {label}
-        {required && <span className="text-zinc-500 ml-1">*</span>}
+        {required && <span className="text-zinc-500 ml-1" aria-hidden="true">*</span>}
       </label>
       {children}
     </div>

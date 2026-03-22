@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 
 interface ProjectData {
@@ -24,6 +24,9 @@ export default function EditProjectModal({ project }: { project: ProjectData }) 
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
 
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const firstInputRef = useRef<HTMLInputElement>(null);
+
   const toDateInput = (iso: string) => iso.split("T")[0];
 
   const [form, setForm] = useState({
@@ -38,6 +41,15 @@ export default function EditProjectModal({ project }: { project: ProjectData }) 
     phase: project.phase,
     type: project.type,
   });
+
+  // Move focus to first input when modal opens; restore to trigger when it closes
+  useEffect(() => {
+    if (open) {
+      firstInputRef.current?.focus();
+    } else {
+      triggerRef.current?.focus();
+    }
+  }, [open]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -76,10 +88,11 @@ export default function EditProjectModal({ project }: { project: ProjectData }) 
   return (
     <>
       <button
+        ref={triggerRef}
         onClick={() => setOpen(true)}
         className="inline-flex items-center gap-1.5 text-sm bg-zinc-700 hover:bg-zinc-600 text-white px-3 py-1.5 rounded-lg transition-colors"
       >
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg aria-hidden="true" className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -95,15 +108,24 @@ export default function EditProjectModal({ project }: { project: ProjectData }) 
           <div
             className="absolute inset-0 bg-black/70 backdrop-blur-sm"
             onClick={() => setOpen(false)}
+            aria-hidden="true"
           />
-          <div className="relative bg-zinc-900 border border-zinc-700/50 rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="edit-modal-title"
+            className="relative bg-zinc-900 border border-zinc-700/50 rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl"
+          >
             <div className="flex items-center justify-between p-6 border-b border-zinc-700/50">
-              <h2 className="text-white font-semibold text-lg">Editar Proyecto</h2>
+              <h2 id="edit-modal-title" className="text-white font-semibold text-lg">
+                Editar Proyecto
+              </h2>
               <button
                 onClick={() => setOpen(false)}
+                aria-label="Cerrar modal"
                 className="text-zinc-400 hover:text-white transition-colors"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg aria-hidden="true" className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
@@ -111,17 +133,26 @@ export default function EditProjectModal({ project }: { project: ProjectData }) 
 
             <form onSubmit={handleSubmit} className="p-6 space-y-5">
               <div>
-                <label className="block text-zinc-400 text-xs mb-1.5 uppercase tracking-wide">
+                <label htmlFor="edit-name" className="block text-zinc-400 text-xs mb-1.5 uppercase tracking-wide">
                   Nombre del Proyecto *
                 </label>
-                <input name="name" value={form.name} onChange={handleChange} required className={inputCls} />
+                <input
+                  ref={firstInputRef}
+                  id="edit-name"
+                  name="name"
+                  value={form.name}
+                  onChange={handleChange}
+                  required
+                  className={inputCls}
+                />
               </div>
 
               <div>
-                <label className="block text-zinc-400 text-xs mb-1.5 uppercase tracking-wide">
+                <label htmlFor="edit-description" className="block text-zinc-400 text-xs mb-1.5 uppercase tracking-wide">
                   Descripción
                 </label>
                 <textarea
+                  id="edit-description"
                   name="description"
                   value={form.description}
                   onChange={handleChange}
@@ -131,18 +162,25 @@ export default function EditProjectModal({ project }: { project: ProjectData }) 
               </div>
 
               <div>
-                <label className="block text-zinc-400 text-xs mb-1.5 uppercase tracking-wide">
+                <label htmlFor="edit-location" className="block text-zinc-400 text-xs mb-1.5 uppercase tracking-wide">
                   Ubicación
                 </label>
-                <input name="location" value={form.location} onChange={handleChange} className={inputCls} />
+                <input
+                  id="edit-location"
+                  name="location"
+                  value={form.location}
+                  onChange={handleChange}
+                  className={inputCls}
+                />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-zinc-400 text-xs mb-1.5 uppercase tracking-wide">
+                  <label htmlFor="edit-startDate" className="block text-zinc-400 text-xs mb-1.5 uppercase tracking-wide">
                     Fecha Inicio *
                   </label>
                   <input
+                    id="edit-startDate"
                     type="date"
                     name="startDate"
                     value={form.startDate}
@@ -152,10 +190,11 @@ export default function EditProjectModal({ project }: { project: ProjectData }) 
                   />
                 </div>
                 <div>
-                  <label className="block text-zinc-400 text-xs mb-1.5 uppercase tracking-wide">
+                  <label htmlFor="edit-endDate" className="block text-zinc-400 text-xs mb-1.5 uppercase tracking-wide">
                     Fecha Fin *
                   </label>
                   <input
+                    id="edit-endDate"
                     type="date"
                     name="endDate"
                     value={form.endDate}
@@ -167,10 +206,11 @@ export default function EditProjectModal({ project }: { project: ProjectData }) 
               </div>
 
               <div>
-                <label className="block text-zinc-400 text-xs mb-1.5 uppercase tracking-wide">
+                <label htmlFor="edit-budget" className="block text-zinc-400 text-xs mb-1.5 uppercase tracking-wide">
                   Presupuesto (€)
                 </label>
                 <input
+                  id="edit-budget"
                   type="number"
                   name="budget"
                   value={form.budget}
@@ -181,10 +221,11 @@ export default function EditProjectModal({ project }: { project: ProjectData }) 
               </div>
 
               <div>
-                <label className="block text-zinc-400 text-xs mb-1.5 uppercase tracking-wide">
+                <label htmlFor="edit-clientName" className="block text-zinc-400 text-xs mb-1.5 uppercase tracking-wide">
                   Cliente *
                 </label>
                 <input
+                  id="edit-clientName"
                   name="clientName"
                   value={form.clientName}
                   onChange={handleChange}
@@ -193,10 +234,10 @@ export default function EditProjectModal({ project }: { project: ProjectData }) 
                 />
               </div>
 
-              <div>
-                <label className="block text-zinc-400 text-xs mb-1.5 uppercase tracking-wide">
+              <fieldset>
+                <legend className="block text-zinc-400 text-xs mb-1.5 uppercase tracking-wide">
                   Tipo de Proyecto
-                </label>
+                </legend>
                 <div className="flex gap-3">
                   {[
                     { value: "administrative", label: "Administrativo" },
@@ -222,14 +263,14 @@ export default function EditProjectModal({ project }: { project: ProjectData }) 
                     </label>
                   ))}
                 </div>
-              </div>
+              </fieldset>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-zinc-400 text-xs mb-1.5 uppercase tracking-wide">
+                  <label htmlFor="edit-status" className="block text-zinc-400 text-xs mb-1.5 uppercase tracking-wide">
                     Estado
                   </label>
-                  <select name="status" value={form.status} onChange={handleChange} className={inputCls}>
+                  <select id="edit-status" name="status" value={form.status} onChange={handleChange} className={inputCls}>
                     <option value="planning">Planificación</option>
                     <option value="in_progress">En progreso</option>
                     <option value="review">Revisión</option>
@@ -238,10 +279,10 @@ export default function EditProjectModal({ project }: { project: ProjectData }) 
                   </select>
                 </div>
                 <div>
-                  <label className="block text-zinc-400 text-xs mb-1.5 uppercase tracking-wide">
+                  <label htmlFor="edit-phase" className="block text-zinc-400 text-xs mb-1.5 uppercase tracking-wide">
                     Fase
                   </label>
-                  <select name="phase" value={form.phase} onChange={handleChange} className={inputCls}>
+                  <select id="edit-phase" name="phase" value={form.phase} onChange={handleChange} className={inputCls}>
                     <option value="concept">Concepto</option>
                     <option value="schematic">Diseño Esquemático</option>
                     <option value="design_development">Desarrollo de Diseño</option>
@@ -252,8 +293,8 @@ export default function EditProjectModal({ project }: { project: ProjectData }) 
                 </div>
               </div>
 
-              {error && <p className="text-red-400 text-sm">{error}</p>}
-              {success && <p className="text-emerald-400 text-sm">¡Proyecto actualizado correctamente!</p>}
+              {error && <p role="alert" className="text-red-400 text-sm">{error}</p>}
+              {success && <p role="status" className="text-emerald-400 text-sm">¡Proyecto actualizado correctamente!</p>}
 
               <div className="flex gap-3 pt-2">
                 <button

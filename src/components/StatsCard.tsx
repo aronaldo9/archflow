@@ -41,10 +41,10 @@ export default function StatsCard({
   const styles = accentStyles[accent];
 
   return (
-    <div className="bg-zinc-800/50 border border-zinc-700/50 rounded-xl p-5 flex flex-col gap-3">
+    <li className="bg-zinc-800/50 border border-zinc-700/50 rounded-xl p-5 flex flex-col gap-3 list-none">
       {/* Top row: label + icon */}
-      <div className="flex items-start justify-between">
-        <p className="text-zinc-400 text-xs font-medium uppercase tracking-wider leading-none">
+      <div className="flex items-start justify-between gap-2">
+        <p className="text-zinc-400 text-xs font-medium uppercase tracking-wider leading-none min-w-0">
           {label}
         </p>
         <span className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${styles.icon}`}>
@@ -71,6 +71,6 @@ export default function StatsCard({
 
       {/* Sub text */}
       <p className="text-zinc-500 text-xs">{sub}</p>
-    </div>
+    </li>
   );
 }

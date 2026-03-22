@@ -106,7 +106,7 @@ export default function MilestoneManager({ projectId, milestones }: Props) {
           onClick={() => setAdding(true)}
           className="inline-flex items-center gap-1.5 text-xs bg-zinc-700 hover:bg-zinc-600 text-white px-2.5 py-1.5 rounded-lg transition-colors"
         >
-          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg aria-hidden="true" className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
           </svg>
           Añadir Hito
@@ -118,12 +118,16 @@ export default function MilestoneManager({ projectId, milestones }: Props) {
           <li key={m.id}>
             {editingId === m.id ? (
               <div className="flex items-center gap-2 flex-wrap">
+                <label htmlFor={`edit-title-${m.id}`} className="sr-only">Nombre del hito</label>
                 <input
+                  id={`edit-title-${m.id}`}
                   value={editTitle}
                   onChange={(e) => setEditTitle(e.target.value)}
                   className={`flex-1 min-w-0 ${inputCls}`}
                 />
+                <label htmlFor={`edit-date-${m.id}`} className="sr-only">Fecha límite</label>
                 <input
+                  id={`edit-date-${m.id}`}
                   type="date"
                   value={editDate}
                   onChange={(e) => setEditDate(e.target.value)}
@@ -148,7 +152,7 @@ export default function MilestoneManager({ projectId, milestones }: Props) {
                 <button
                   onClick={() => handleToggle(m)}
                   disabled={loading === m.id}
-                  title={m.completed ? "Marcar como pendiente" : "Marcar como completado"}
+                  aria-label={m.completed ? `Marcar "${m.title}" como pendiente` : `Marcar "${m.title}" como completado`}
                   className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 border-2 transition-colors disabled:opacity-50 ${
                     m.completed
                       ? "bg-emerald-500/20 border-emerald-500 hover:bg-emerald-500/30"
@@ -156,7 +160,7 @@ export default function MilestoneManager({ projectId, milestones }: Props) {
                   }`}
                 >
                   {m.completed && (
-                    <svg className="w-3 h-3 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg aria-hidden="true" className="w-3 h-3 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                     </svg>
                   )}
@@ -166,16 +170,16 @@ export default function MilestoneManager({ projectId, milestones }: Props) {
                     {m.title}
                   </p>
                 </div>
-                <span className={`text-xs flex-shrink-0 ${m.completed ? "text-zinc-600" : "text-zinc-400"}`}>
+                <span className={`text-xs flex-shrink-0 ${m.completed ? "text-zinc-500" : "text-zinc-400"}`}>
                   {formatDate(m.dueDate)}
                 </span>
                 <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button
                     onClick={() => startEdit(m)}
-                    title="Editar hito"
+                    aria-label="Editar hito"
                     className="text-zinc-400 hover:text-white p-1 rounded transition-colors"
                   >
-                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg aria-hidden="true" className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -187,10 +191,10 @@ export default function MilestoneManager({ projectId, milestones }: Props) {
                   <button
                     onClick={() => handleDelete(m.id)}
                     disabled={loading === m.id}
-                    title="Eliminar hito"
+                    aria-label="Eliminar hito"
                     className="text-zinc-400 hover:text-red-400 p-1 rounded transition-colors disabled:opacity-50"
                   >
-                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg aria-hidden="true" className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -210,14 +214,18 @@ export default function MilestoneManager({ projectId, milestones }: Props) {
         <div className="mt-4 p-3 bg-zinc-800/60 rounded-lg border border-zinc-700/50">
           <p className="text-xs text-zinc-400 mb-2 uppercase tracking-wide">Nuevo Hito</p>
           <div className="flex gap-2 flex-wrap">
+            <label htmlFor="new-milestone-title" className="sr-only">Nombre del hito</label>
             <input
+              id="new-milestone-title"
               placeholder="Nombre del hito..."
               value={newTitle}
               onChange={(e) => setNewTitle(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleAdd()}
               className={`flex-1 min-w-0 ${inputCls} placeholder:text-zinc-500`}
             />
+            <label htmlFor="new-milestone-date" className="sr-only">Fecha límite</label>
             <input
+              id="new-milestone-date"
               type="date"
               value={newDate}
               onChange={(e) => setNewDate(e.target.value)}
